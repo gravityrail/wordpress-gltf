@@ -158,10 +158,10 @@ class Gltf {
 	public function model_shortcode( $atts ) {
 		$a = shortcode_atts( array(
 			'url' => '',
-			// 'bar' => 'something else',
+			'scale' => '1.0'
 		), $atts );
 
-		return "<div class=\"gltf-model\" style=\"height: 300px\" data-model=\"".htmlspecialchars($a['url'])."\">model goes here</div>";
+		return '<div class="gltf-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
 	}
 
 	public function enqueue_model_render_script() {
@@ -169,7 +169,8 @@ class Gltf {
 	    if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'gltf_model') ) {
 	        wp_enqueue_script( 'threejs', plugin_dir_url( dirname( __FILE__ ) ) . 'js/three.min.js', null, $this->version, false );
 	        wp_enqueue_script( 'gltf-loader', plugin_dir_url( dirname( __FILE__ ) ) . 'js/loaders/GLTFLoader.js', array( 'threejs' ), $this->version, false );
-	        wp_enqueue_script( 'gltf-model-preview', plugin_dir_url( dirname( __FILE__ ) ) . 'js/gltf-model-preview.js', array( 'jquery', 'gltf-loader' ), $this->version, false );
+	        wp_enqueue_script( 'orbitcontrols', plugin_dir_url( dirname( __FILE__ ) ) . 'js/OrbitControls.js', array( 'threejs' ), $this->version, false );
+	        wp_enqueue_script( 'gltf-model-preview', plugin_dir_url( dirname( __FILE__ ) ) . 'js/gltf-model-preview.js', array( 'jquery', 'gltf-loader', 'orbitcontrols' ), $this->version, false );
 	    }
 	}
 
