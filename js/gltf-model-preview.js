@@ -79,9 +79,9 @@ function initializeGltfElement() {
 
 	scene = new THREE.Scene();
 
-	addCamera();
-	addLights();
-	addRenderer();
+	addLights(); // LIGHTS!
+	addCamera(); // CAMERA!
+	addRenderer(); // ACTION! :)
 	addControls();
 	addLoadingLogger();
 
