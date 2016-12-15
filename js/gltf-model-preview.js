@@ -1,6 +1,7 @@
 
-
-jQuery( function() {
+function initializeGltfElement() {
+	$el = jQuery(this);
+	console.log( $el );
 	var container, camera, scene, renderer, loader, gltf;
 
 	function addLights() {
@@ -34,11 +35,10 @@ jQuery( function() {
 		controls.update();
 	}
 
-	container = jQuery( '.gltf-model' ).first();//document.getElementById( 'container' );
-	modelUrl = container.data( 'model' );
-	modelScale = container.data( 'scale' );
-	container = container.get(0);
-	console.log( "loading model from " + modelUrl );
+	var modelUrl = $el.data( 'model' );
+	var modelScale = $el.data( 'scale' );
+	container = $el.get(0);
+	console.log( "loading model from " + modelUrl + " at scale "+modelScale);
 	scene = new THREE.Scene();
 
 	camera = new THREE.PerspectiveCamera( 75, container.offsetWidth / container.offsetHeight, 1, 2000 );
@@ -82,4 +82,8 @@ jQuery( function() {
 	} );
 
 	animate();
+}
+
+jQuery( function() {
+	jQuery( '.gltf-model' ).each( initializeGltfElement );
 } );
