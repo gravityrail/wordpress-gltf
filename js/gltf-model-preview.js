@@ -1,8 +1,14 @@
 
 function initializeGltfElement() {
 	$el = jQuery(this);
-	console.log( $el );
-	var container, camera, scene, renderer, loader, gltf;
+
+	var container, camera, scene, renderer;
+
+	function addCamera() {
+		camera = new THREE.PerspectiveCamera( 75, container.offsetWidth / container.offsetHeight, 1, 2000 );
+		camera.position.set(0, 2, 3);
+		scene.add( camera );
+	}
 
 	function addLights() {
 		var ambient = new THREE.AmbientLight( 0x101030 );
@@ -23,6 +29,40 @@ function initializeGltfElement() {
 		controls.autoRotateSpeed = -10.0;
 	}
 
+	function addRenderer() {
+		renderer = new THREE.WebGLRenderer({antialias:true});
+		renderer.setClearColor( 0x222222 );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( container.offsetWidth, container.offsetHeight );
+	}
+
+	function addLoadingLogger() {
+		var manager = new THREE.LoadingManager();
+	    manager.onProgress = function ( item, loaded, total ) {
+	        console.log( item, loaded, total );
+	    };
+	}
+
+	function loadModel( modelUrl, modelScale ) {
+		THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
+		var loader = new THREE.GLTFLoader;
+		loader.load( modelUrl, function( data ) {
+			var object = data.scene;
+			object.scale.set(modelScale, modelScale, modelScale);
+
+			var animations = data.animations;
+	        if ( animations && animations.length ) {
+	            mixer = new THREE.AnimationMixer( object );
+	            for ( var i = 0; i < animations.length; i ++ ) {
+	                var animation = animations[ i ];
+	                mixer.clipAction( animation ).play();
+	            }
+	        }
+
+			scene.add( object );
+		} );
+	}
+
 	function render() {
 		renderer.render( scene, camera );
 	}
@@ -35,51 +75,19 @@ function initializeGltfElement() {
 		controls.update();
 	}
 
-	var modelUrl = $el.data( 'model' );
-	var modelScale = $el.data( 'scale' );
 	container = $el.get(0);
-	console.log( "loading model from " + modelUrl + " at scale "+modelScale);
+
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera( 75, container.offsetWidth / container.offsetHeight, 1, 2000 );
-	camera.position.set(0, 2, 3);
-	scene.add( camera );
+	addCamera();
 	addLights();
-
-	renderer = new THREE.WebGLRenderer({antialias:true});
-	renderer.setClearColor( 0x222222 );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( container.offsetWidth, container.offsetHeight );
-
+	addRenderer();
 	addControls();
-
-	var manager = new THREE.LoadingManager();
-    manager.onProgress = function ( item, loaded, total ) {
-        console.log( item, loaded, total );
-    };
+	addLoadingLogger();
 
 	container.appendChild( renderer.domElement );
 
-	THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
-	loader = new THREE.GLTFLoader;
-
-	loader.load( modelUrl, function( data ) {
-		gltf = data;
-
-		var object = gltf.scene;
-		object.scale.set(modelScale, modelScale, modelScale);
-
-		var animations = gltf.animations;
-        if ( animations && animations.length ) {
-            mixer = new THREE.AnimationMixer( object );
-            for ( var i = 0; i < animations.length; i ++ ) {
-                var animation = animations[ i ];
-                mixer.clipAction( animation ).play();
-            }
-        }
-
-		scene.add( object );
-	} );
+	loadModel( $el.data( 'model' ), $el.data( 'scale' ) );
 
 	animate();
 }
