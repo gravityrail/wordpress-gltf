@@ -10,7 +10,7 @@
  * @wordpress-plugin
  * Plugin Name:       GLTF Media Type
  * Plugin URI:        http://goldsounds.com/plugins/gltf
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       A plugin to upload and render glTF 3D models in WordPress.
  * Version:           1.0.0
  * Author:            Daniel Walmsley
  * Author URI:        http://goldsounds.com
