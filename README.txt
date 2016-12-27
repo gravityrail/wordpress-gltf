@@ -17,8 +17,8 @@ This plugin includes [Three.js](https://github.com/mrdoob/three.js/), a wonderfu
 
 == Installation ==
 
-1. Upload `gltf.php` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
+1. Unzip this plugin in the `/wp-content/plugins/` directory
+1. Activate the "glTF Media Type" plugin through the 'Plugins' menu in WordPress
 1. Upload .gltf or .glb files via the Media browser, or via the Add Media button for posts/pages.
 1. Embed the 3D object in posts using a shortcode, like `[gltf_model scale="1.0" url="http://mywordpresssite.com/wp-content/uploads/2016/12/model.gltf"]. Note: You may get that full URL from the Media browser by selecting the file and copying the link.
 
