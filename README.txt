@@ -3,15 +3,15 @@ Contributors: goldsounds
 Tags: comments, spam
 Requires at least: 4.5
 Tested up to: 4.7
-Stable tag: 1.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-A plugin to upload and render [glTF](https://github.com/KhronosGroup/glTF) models in WordPress.
+A plugin to upload and render glTF 3D models in WordPress.
 
 == Description ==
 
-glTF is an emerging open standard for the transmission and storage of 3D models. This plugin allows you to upload these models in "Embedded JSON" and Binary formats. Currently, inline rendering is only supported for the JSON format.
+[glTF](https://github.com/KhronosGroup/glTF) is an emerging open standard for the transmission and storage of 3D models. This plugin allows you to upload these models in "Embedded JSON" and Binary formats. Currently, inline rendering is only supported for the JSON format.
 
 This plugin includes [Three.js](https://github.com/mrdoob/three.js/), a wonderful creation of [Mr Doob](http://mrdoob.com/) and many others. I am massively impressed by their work.
 
