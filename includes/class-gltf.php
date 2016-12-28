@@ -143,6 +143,17 @@ class Gltf {
 		add_action( 'add_meta_boxes_gltf_scene', array( $this, 'add_scene_metaboxes' ) );
 		add_action( 'save_post_gltf_scene', array( $this, 'save_scene_metaboxes' ), 10, 3 );
 		add_filter( 'single_template', array( $this, 'register_scene_template' ) );
+
+		// remove the sidebars before rendering a scene
+		add_filter( 'body_class', function( $classes ) {
+			global $post;
+			
+			if ( $post && $post->post_type == 'gltf_scene' && in_array( 'has-sidebar', $classes ) ) {
+				$classes = array_diff( $classes, array('has-sidebar') );
+			}
+			
+			return $classes;
+		}, 99, 1 );
 	}
 
 	public function upload_mime_types( $mimes ) {
@@ -196,6 +207,7 @@ class Gltf {
 
 		// See if there's a media id already saved as post meta
 		$main_model_id = get_post_meta( $post->ID, '_gltf_main_model', true );
+		$main_model_scale = get_post_meta( $post->ID, '_gltf_main_model_scale', true );
 
 		// Get the image src
 		$main_model_url = wp_get_attachment_url( $main_model_id );
@@ -206,25 +218,32 @@ class Gltf {
 
 		<!-- Your image container, which can be manipulated with js -->
 		<div class="gltf-main-model-container">
-		    <?php if ( $main_model_is_set ) : ?>
-		    	<div class="gltf-model" data-model="<?php echo $main_model_url ?>" data-scale="1.0" style="width: 300px; height: 300px;"></div>
-		    <?php endif; ?>
+			<?php if ( $main_model_is_set ) : ?>
+				<div class="gltf-model" data-model="<?php echo $main_model_url ?>" data-scale="1.0" style="width: 300px; height: 300px;"></div>
+			<?php endif; ?>
 		</div>
 
 		<!-- Your add & remove image links -->
 		<p class="hide-if-no-js">
-		    <a class="upload-main-model <?php if ( $main_model_is_set  ) { echo 'hidden'; } ?>" 
-		       href="<?php echo $upload_link ?>">
-		        <?php _e('Set main 3D model') ?>
-		    </a>
-		    <a class="delete-main-model <?php if ( ! $main_model_is_set  ) { echo 'hidden'; } ?>" 
-		      href="#">
-		        <?php _e('Remove this 3D model') ?>
-		    </a>
+			<a class="upload-main-model <?php if ( $main_model_is_set  ) { echo 'hidden'; } ?>" 
+			   href="<?php echo $upload_link ?>">
+				<?php _e('Set main 3D model') ?>
+			</a>
+			<a class="delete-main-model <?php if ( ! $main_model_is_set  ) { echo 'hidden'; } ?>" 
+			  href="#">
+				<?php _e('Remove this 3D model') ?>
+			</a>
 		</p>
 
 		<!-- A hidden input to set and post the chosen image id -->
 		<input class="main-model-id" name="main-model-id" type="hidden" value="<?php echo esc_attr( $main_model_id ); ?>" />
+
+		<p>
+			<label for="main-model-scale">
+				<?php _e( 'Model Scale', 'gltf-media-type '); ?>
+				<input class="main-model-scale" name="main-model-scale" value="<?php echo esc_attr( $main_model_scale ? $main_model_scale : 1.0 ); ?>" />
+			</label>
+		</p>
 		<?php
 		/* 
 		
@@ -263,6 +282,9 @@ class Gltf {
 		error_log(print_r($_POST,1));
 		if( isset( $_POST[ 'main-model-id' ] ) ) {
 			update_post_meta( $post_id, '_gltf_main_model', $_POST[ 'main-model-id' ] );
+		}
+		if( isset( $_POST[ 'main-model-scale' ] ) ) {
+			update_post_meta( $post_id, '_gltf_main_model_scale', $_POST[ 'main-model-scale' ] );
 		}
 		if( isset( $_POST[ 'meta-radio' ] ) ) {
 			update_post_meta( $post_id, 'meta-radio', $_POST[ 'meta-radio' ] );

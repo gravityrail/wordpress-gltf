@@ -95,8 +95,9 @@ class Gltf_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/gltf-public.js', array( 'jquery' ), $this->version, false );
+		require_once dirname( dirname( __FILE__ ) ) . '/includes/class-gltf-model-utils.php';
+		Gltf_Model_Utils::enqueue_common_gltf_scripts( $this->version );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/gltf-public.js', array( 'jquery', 'orbitcontrols' ), $this->version, false );
 
 	}
 

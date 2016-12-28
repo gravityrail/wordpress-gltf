@@ -10,10 +10,14 @@
 // TODO: move this to somewhere it can be shared, so we can render it in response to mysite.com/mypost?format=json
 function get_scene_as_json( $scene ) {
 
+        $main_model_id = get_post_meta( $scene->ID, '_gltf_main_model', true );
+        $main_model_url = wp_get_attachment_url( $main_model_id );
+
 	$scene_obj = array(
 		// TODO
 		// - "main" object, cube, something?
-                'main_model' => get_metadata( 'gltf_scene', $scene->ID, '_gltf_main_model', true )
+                'main_model' => $main_model_url,
+                'main_model_scale' => get_post_meta( $scene->ID, '_gltf_main_model_scale', true ),
 		// - location, scale, lights?
 		// - form of locomotion - am I walking? Flying?
 		// - links? Are they just an object that can be "selected"? Or a special kind of object that always looks the same?
@@ -37,7 +41,7 @@ get_header(); ?>
                                 while ( have_posts() ) : the_post();
                                 		$scene_dom_id = 'gltf-scene-'.get_the_ID();
                                 		?>The VR Scene
-                                		<div class="gltf-scene" id="<?php echo $scene_dom_id; ?>"></div>
+                                		<div class="gltf-scene" id="<?php echo $scene_dom_id; ?>" style="height: 600px"></div>
                                 		<script type="text/javascript">
                                 			jQuery( function() {
                                 				console.log("loading");
@@ -67,7 +71,6 @@ get_header(); ?>
 
                 </main><!-- #main -->
         </div><!-- #primary -->
-        <?php get_sidebar(); ?>
 </div><!-- .wrap -->
 
 <?php get_footer();
