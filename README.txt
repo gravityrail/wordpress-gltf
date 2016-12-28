@@ -3,7 +3,7 @@ Contributors: goldsounds
 Tags: comments, spam
 Requires at least: 4.5
 Tested up to: 4.7
-Stable tag: 1.0.1
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,10 +22,6 @@ This plugin includes [Three.js](https://github.com/mrdoob/three.js/), a wonderfu
 1. Upload .gltf or .glb files via the Media browser, or via the Add Media button for posts/pages.
 1. Embed the 3D object in posts using a shortcode, like `[gltf_model scale="1.0" url="http://mywordpresssite.com/wp-content/uploads/2016/12/model.gltf"]. Note: You may get that full URL from the Media browser by selecting the file and copying the link.
 
-== TODO ==
-
-1. Render scene to JSON using ?json=true param? This would allow a remote client to browse from scene to scene without breaking out of VR (and we could also apply our Photon CDN to the assets).
-
 == Frequently Asked Questions ==
 
 None yet.
@@ -35,6 +31,9 @@ None yet.
 None yet.
 
 == Changelog ==
+
+= 1.1 =
+* Add gltf_scene post type
 
 = 1.0 =
 * First version, just basic rendering
