@@ -30,7 +30,10 @@ class Gltf_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+		require_once plugin_dir_path( __FILE__ ) . 'class-gltf.php';
+		$plugin = new Gltf();
+		$plugin->register_scene_post_type();
+		flush_rewrite_rules();
 	}
 
 }

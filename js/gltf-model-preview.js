@@ -11,7 +11,8 @@ function initializeGltfElement() {
 	}
 
 	function addLights() {
-		var ambient = new THREE.AmbientLight( 0x101030 );
+		// var ambient = new THREE.AmbientLight( 0x101030 );
+		var ambient = new THREE.AmbientLight( 0xFFFFFF, 1 );
 	    scene.add( ambient );
 
 	    var directionalLight = new THREE.DirectionalLight( 0xffeedd );

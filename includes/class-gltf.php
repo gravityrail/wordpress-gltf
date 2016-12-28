@@ -139,6 +139,10 @@ class Gltf {
 		add_shortcode( 'gltf_model', array( $this, 'model_shortcode' ) );
 		// add three.js if the current post has our shortcode
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_model_render_script' ) );
+		add_action( 'init', array( $this, 'register_scene_post_type' ) );
+		add_action( 'add_meta_boxes_gltf_scene', array( $this, 'add_scene_metaboxes' ) );
+		add_action( 'save_post_gltf_scene', array( $this, 'save_scene_metaboxes' ), 10, 3 );
+		add_filter( 'single_template', array( $this, 'register_scene_template' ) );
 	}
 
 	public function upload_mime_types( $mimes ) {
@@ -164,14 +168,124 @@ class Gltf {
 		return '<div class="gltf-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
 	}
 
+	public function register_scene_post_type() {
+		register_post_type( 'gltf_scene',
+			array(
+				'labels' => array(
+					'name' => __( 'Scenes' ),
+					'singular_name' => __( 'Scene' )
+				),
+				'public' => true,
+				'has_archive' => true,
+				'rewrite' => array('slug' => 'scenes'),
+			)
+		);
+	}
+
+	function add_scene_metaboxes() {
+		add_meta_box( 'gltf_select_scene_model', __( 'Select Scene Model', 'gltf-media-type' ), array( $this, 'select_scene_model_callback' ), 'gltf_scene' );
+		// add_meta_box( 'scene_select_model', 'Select Model', 'swp_file_upload', 'podcasts', 'normal', 'default' );
+	}
+
+	function select_scene_model_callback( $post ) {
+		wp_nonce_field( basename( __FILE__ ), 'gltf_nonce' );
+
+		// global $post;
+		// Get WordPress' media upload URL
+		$upload_link = esc_url( get_upload_iframe_src( 'image', $post->ID ) );
+
+		// See if there's a media id already saved as post meta
+		$main_model_id = get_post_meta( $post->ID, '_gltf_main_model', true );
+
+		// Get the image src
+		$main_model_url = wp_get_attachment_url( $main_model_id );
+
+		// For convenience, see if the array is valid
+		$main_model_is_set = !! $main_model_url;
+		?>
+
+		<!-- Your image container, which can be manipulated with js -->
+		<div class="gltf-main-model-container">
+		    <?php if ( $main_model_is_set ) : ?>
+		    	<div class="gltf-model" data-model="<?php echo $main_model_url ?>" data-scale="1.0" style="width: 300px; height: 300px;"></div>
+		    <?php endif; ?>
+		</div>
+
+		<!-- Your add & remove image links -->
+		<p class="hide-if-no-js">
+		    <a class="upload-main-model <?php if ( $main_model_is_set  ) { echo 'hidden'; } ?>" 
+		       href="<?php echo $upload_link ?>">
+		        <?php _e('Set main 3D model') ?>
+		    </a>
+		    <a class="delete-main-model <?php if ( ! $main_model_is_set  ) { echo 'hidden'; } ?>" 
+		      href="#">
+		        <?php _e('Remove this 3D model') ?>
+		    </a>
+		</p>
+
+		<!-- A hidden input to set and post the chosen image id -->
+		<input class="main-model-id" name="main-model-id" type="hidden" value="<?php echo esc_attr( $main_model_id ); ?>" />
+		<?php
+		/* 
+		
+		$gltf_stored_meta = get_post_meta( $post->ID );
+		?>
+		<p>
+			<span class="gltf-row-title"><?php _e( 'Example Radio Buttons', 'gltf-media-type' )?></span>
+			<div class="gltf-row-content">
+				<label for="meta-radio-one">
+					<input type="radio" name="meta-radio" id="meta-radio-one" value="radio-one" <?php if ( isset ( $gltf_stored_meta['meta-radio'] ) ) checked( $gltf_stored_meta['meta-radio'][0], 'radio-one' ); ?>>
+					<?php _e( 'Radio Option #1', 'gltf-media-type' )?>
+				</label>
+				<label for="meta-radio-two">
+					<input type="radio" name="meta-radio" id="meta-radio-two" value="radio-two" <?php if ( isset ( $gltf_stored_meta['meta-radio'] ) ) checked( $gltf_stored_meta['meta-radio'][0], 'radio-two' ); ?>>
+					<?php _e( 'Radio Option #2', 'gltf-media-type' )?>
+				</label>
+			</div>
+		</p><?php
+		*/
+	}
+
+	public function save_scene_metaboxes( $post_id, $post, $update ) {
+		$is_autosave = wp_is_post_autosave( $post_id );
+		$is_revision = wp_is_post_revision( $post_id );
+		$is_valid_nonce = ( isset( $_POST[ 'gltf_nonce' ] ) && wp_verify_nonce( $_POST[ 'gltf_nonce' ], basename( __FILE__ ) ) ) ? 'true' : 'false';
+	 
+		// Exits script depending on save status
+		if ( $is_autosave || $is_revision || !$is_valid_nonce ) {
+			return;
+		}
+	 
+		// Checks for input and sanitizes/saves if needed
+		// if( isset( $_POST[ 'meta-text' ] ) ) {
+		// 	update_post_meta( $post_id, 'meta-text', sanitize_text_field( $_POST[ 'meta-text' ] ) );
+		// }
+		error_log(print_r($_POST,1));
+		if( isset( $_POST[ 'main-model-id' ] ) ) {
+			update_post_meta( $post_id, '_gltf_main_model', $_POST[ 'main-model-id' ] );
+		}
+		if( isset( $_POST[ 'meta-radio' ] ) ) {
+			update_post_meta( $post_id, 'meta-radio', $_POST[ 'meta-radio' ] );
+		}
+	}
+
+	public function register_scene_template( $single ) {
+		global $wp_query, $post;
+
+		/* Checks for single template by post type */
+		if ($post->post_type == 'gltf_scene'){
+			return dirname( dirname( __FILE__ ) ) . '/public/templates/single-gltf_scene.php';
+		}
+
+		return $single;
+	}
+
 	public function enqueue_model_render_script() {
 		global $post;
-	    if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'gltf_model') ) {
-	        wp_enqueue_script( 'threejs', plugin_dir_url( dirname( __FILE__ ) ) . 'js/three.min.js', null, $this->version, false );
-	        wp_enqueue_script( 'gltf-loader', plugin_dir_url( dirname( __FILE__ ) ) . 'js/loaders/GLTFLoader.js', array( 'threejs' ), $this->version, false );
-	        wp_enqueue_script( 'orbitcontrols', plugin_dir_url( dirname( __FILE__ ) ) . 'js/OrbitControls.js', array( 'threejs' ), $this->version, false );
-	        wp_enqueue_script( 'gltf-model-preview', plugin_dir_url( dirname( __FILE__ ) ) . 'js/gltf-model-preview.js', array( 'jquery', 'gltf-loader', 'orbitcontrols' ), $this->version, false );
-	    }
+		if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'gltf_model') ) {
+			require_once dirname( __FILE__ ) . '/class-gltf-model-utils.php';
+			Gltf_Model_Utils::enqueue_scripts( $this->version );
+		}
 	}
 
 	/**
