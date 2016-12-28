@@ -279,7 +279,6 @@ class Gltf {
 		// if( isset( $_POST[ 'meta-text' ] ) ) {
 		// 	update_post_meta( $post_id, 'meta-text', sanitize_text_field( $_POST[ 'meta-text' ] ) );
 		// }
-		error_log(print_r($_POST,1));
 		if( isset( $_POST[ 'main-model-id' ] ) ) {
 			update_post_meta( $post_id, '_gltf_main_model', $_POST[ 'main-model-id' ] );
 		}
