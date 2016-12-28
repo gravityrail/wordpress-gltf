@@ -13,7 +13,9 @@ A plugin to upload and render glTF 3D models in WordPress.
 
 [glTF](https://github.com/KhronosGroup/glTF) is an emerging open standard for the transmission and storage of 3D models. This plugin allows you to upload these models in "Embedded JSON" and Binary formats. Currently, inline rendering is only supported for the JSON format.
 
-This plugin includes [Three.js](https://github.com/mrdoob/three.js/), a wonderful creation of [Mr Doob](http://mrdoob.com/) and many others. I am massively impressed by their work.
+The ultimate goal of this plugin is to provide a 3D "post type" (gltf_scene) which allows the user to compose an interactive scene populated by objects that represent other content from their site (e.g. a book containing posts in a particular category, a door leading to another page or site). It is also a goal to make this content work best in VR headsets, but with a workable fallback for browsers.
+
+This plugin includes [Three.js](https://github.com/mrdoob/three.js/), a wonderful creation of [Mr Doob](http://mrdoob.com/) and many others. I am massively impressed by their work. I am also not so great at PHP or Javascript, so please forgive my missteps.
 
 == Installation ==
 
