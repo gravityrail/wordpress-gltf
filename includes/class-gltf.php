@@ -183,12 +183,17 @@ class Gltf {
 		register_post_type( 'gltf_scene',
 			array(
 				'labels' => array(
-					'name' => __( 'Scenes' ),
+					'name'          => __( 'Scenes' ),
 					'singular_name' => __( 'Scene' )
 				),
-				'public' => true,
-				'has_archive' => true,
-				'rewrite' => array('slug' => 'scenes'),
+				'public'             => true,
+				'has_archive'        => true,
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
+				'rewrite'            => array('slug' => 'scenes'),
+				'menu_icon'          => 'dashicons-star-filled',
+				'rest_base'          => 'scene',
+				'rest_controller_class' => 'WP_REST_Posts_Controller'
 			)
 		);
 	}
