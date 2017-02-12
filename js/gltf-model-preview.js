@@ -4,6 +4,8 @@ function initializeGltfElement() {
 
 	var container, camera, scene, renderer;
 
+	var width, height, aspect;
+
 	function addCamera() {
 		camera = new THREE.PerspectiveCamera( 75, container.offsetWidth / container.offsetHeight, 1, 2000 );
 		camera.position.set(0, 2, 3);
@@ -96,6 +98,18 @@ function initializeGltfElement() {
 	    };
 	}
 
+	function onResize() {
+		width = window.innerWidth;
+		height = window.innerHeight;
+		aspect = width / height;
+		camera.aspect = aspect;
+		camera.updateProjectionMatrix();
+	}
+
+	function addListeners() {
+		window.addEventListener('resize', onResize);
+	}
+
 	function loadModel( modelUrl, modelScale ) {
 		THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
 		var loader = new THREE.GLTFLoader;
@@ -140,6 +154,7 @@ function initializeGltfElement() {
 	addRenderer(); // ACTION! :)
 	addControls();
 	addLoadingLogger();
+	addListeners();
 
 	container.appendChild( renderer.domElement );
 
