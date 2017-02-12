@@ -68,15 +68,14 @@ function initializeGltfElement() {
 			console.log("doing VR");
 			controls = new THREE.VRControls( camera );
 			effect = new THREE.VREffect( renderer );
+			addWebVRButton( effect );
 			navigator.getVRDisplays()
 				.then( function ( displays ) {
 					effect.setVRDisplay( displays[ 0 ] );
 					controls.setVRDisplay( displays[ 0 ] );
-					addWebVRButton( effect );
 				} )
 				.catch( function () {
 					// no displays
-					addFallbackControls();
 				} );
 		} else {
 			addFallbackControls();
@@ -130,6 +129,9 @@ function initializeGltfElement() {
 	}
 
 	container = $el.get(0);
+
+	// necessary for the enter VR button to appear in the right position
+	$el.css({'position':'relative'});
 
 	scene = new THREE.Scene();
 
