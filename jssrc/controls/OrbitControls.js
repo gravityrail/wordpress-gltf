@@ -4,7 +4,10 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author erich666 / http://erichaines.com
+ * @see ./node_modules/three/examples/js/controls/OrbitControls.js
  */
+
+import * as THREE from 'three';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -1014,3 +1017,5 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 	}
 
 } );
+
+export default THREE.OrbitControls;

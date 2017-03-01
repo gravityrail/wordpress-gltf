@@ -96,8 +96,8 @@ class Gltf_Public {
 		 * class.
 		 */
 		require_once dirname( dirname( __FILE__ ) ) . '/includes/class-gltf-model-utils.php';
-		Gltf_Model_Utils::enqueue_common_gltf_scripts( $this->version );
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/gltf-public.js', array( 'jquery', 'wp-api', 'orbitcontrols' ), $this->version, false );
+		// Gltf_Model_Utils::enqueue_common_gltf_scripts( $this->version );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
 
 	}
 

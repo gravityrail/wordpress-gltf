@@ -6,10 +6,12 @@
  *
  * Firefox: http://mozvr.com/downloads/
  * Chromium: https://webvr.info/get-chrome
- *
+ * @see ./node_modules/three/examples/js/effects/VREffect.js
  */
 
-THREE.VREffect = function( renderer, onError ) {
+import * as THREE from 'three';
+
+export default function( renderer, onError ) {
 
 	var vrDisplay, vrDisplays;
 	var eyeTranslationL = new THREE.Vector3();

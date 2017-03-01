@@ -158,6 +158,7 @@ class Gltf {
 
 	public function upload_mime_types( $mimes ) {
 		foreach( $this->gltf_mime_types as $ext => $type ) {
+			error_log("permitting $ext");
 			$mimes[ $ext ] = $type;
 		}
 

@@ -1,0 +1,24 @@
+{
+  "name": "gltf",
+  "version": "1.0.0",
+  "description": "=== Plugin Name === Contributors: goldsounds Tags: comments, spam Requires at least: 4.7 Tested up to: 4.7 Stable tag: 1.2 License: GPLv2 or later License URI: http://www.gnu.org/licenses/gpl-2.0.html",
+  "main": "webpack.config.js",
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gravityrail/wordpress-gltf.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gravityrail/wordpress-gltf/issues"
+  },
+  "homepage": "https://github.com/gravityrail/wordpress-gltf#readme",
+  "devDependencies": {
+    "three": "^0.84.0",
+    "webvr-ui": "^0.9.4"
+  }
+}
