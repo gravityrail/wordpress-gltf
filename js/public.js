@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -84,8 +84,8 @@
 /* unused harmony export LensFlare */
 /* unused harmony export Sprite */
 /* unused harmony export LOD */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_34", function() { return SkinnedMesh; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_35", function() { return Skeleton; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_35", function() { return SkinnedMesh; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_36", function() { return Skeleton; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_33", function() { return Bone; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_24", function() { return Mesh; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_25", function() { return LineSegments; });
@@ -161,7 +161,7 @@
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_22", function() { return Object3D; });
 /* unused harmony export Raycaster */
 /* unused harmony export Layers */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_40", function() { return EventDispatcher; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_41", function() { return EventDispatcher; });
 /* unused harmony export Clock */
 /* unused harmony export QuaternionLinearInterpolant */
 /* unused harmony export LinearInterpolant */
@@ -170,7 +170,7 @@
 /* unused harmony export Interpolant */
 /* unused harmony export Triangle */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_27", function() { return _Math; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_39", function() { return Spherical; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_40", function() { return Spherical; });
 /* unused harmony export Cylindrical */
 /* unused harmony export Plane */
 /* unused harmony export Frustum */
@@ -185,7 +185,7 @@
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "r", function() { return Vector4; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return Vector3; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return Vector2; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_38", function() { return Quaternion; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_39", function() { return Quaternion; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return Color; });
 /* unused harmony export MorphBlendMesh */
 /* unused harmony export ImmediateRenderObject */
@@ -289,7 +289,7 @@
 /* unused harmony export Int8BufferAttribute */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_15", function() { return BufferAttribute; });
 /* unused harmony export REVISION */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_37", function() { return MOUSE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_38", function() { return MOUSE; });
 /* unused harmony export CullFaceNone */
 /* unused harmony export CullFaceBack */
 /* unused harmony export CullFaceFront */
@@ -43369,6 +43369,1228 @@ function CanvasRenderer() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// Copyright 2016 Google Inc.
+//
+//     Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+//     You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+//     Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+//     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//     See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Not yet presenting, but ready to present
+const READY_TO_PRESENT = 'ready';
+
+// In presentation mode
+const PRESENTING = 'presenting';
+const PRESENTING_FULLSCREEN = 'presenting-fullscreen';
+
+// Checking device availability
+const PREPARING = 'preparing';
+
+// Errors
+const ERROR_NO_PRESENTABLE_DISPLAYS = 'error-no-presentable-displays';
+const ERROR_BROWSER_NOT_SUPPORTED = 'error-browser-not-supported';
+const ERROR_REQUEST_TO_PRESENT_REJECTED = 'error-request-to-present-rejected';
+const ERROR_EXIT_PRESENT_REJECTED = 'error-exit-present-rejected';
+const ERROR_REQUEST_STATE_CHANGE_REJECTED = 'error-request-state-change-rejected';
+const ERROR_UNKOWN = 'error-unkown';
+
+/* harmony default export */ __webpack_exports__["a"] = {
+  READY_TO_PRESENT,
+  PRESENTING,
+  PRESENTING_FULLSCREEN,
+  PREPARING,
+  ERROR_NO_PRESENTABLE_DISPLAYS,
+  ERROR_BROWSER_NOT_SUPPORTED,
+  ERROR_REQUEST_TO_PRESENT_REJECTED,
+  ERROR_EXIT_PRESENT_REJECTED,
+  ERROR_REQUEST_STATE_CHANGE_REJECTED,
+  ERROR_UNKOWN,
+};
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if (true) {
+  module.exports = EventEmitter;
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// Copyright 2016 Google Inc.
+//
+//     Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+//     You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+//     Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+//     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//     See the License for the specific language governing permissions and
+// limitations under the License.
+
+const _LOGO_SCALE = 0.8;
+let _WEBVR_UI_CSS_INJECTED = {};
+
+/**
+ * Generate the innerHTML for the button
+ *
+ * @return {string} html of the button as string
+ * @param {string} cssPrefix
+ * @param {Number} height
+ * @private
+ */
+const generateInnerHTML = (cssPrefix, height)=> {
+  const logoHeight = height*_LOGO_SCALE;
+  const svgString = generateVRIconString(cssPrefix, logoHeight) + generateNoVRIconString(cssPrefix, logoHeight);
+
+  return `<button class="${cssPrefix}-button">
+          <div class="${cssPrefix}-title"></div>
+          <div class="${cssPrefix}-logo" >${svgString}</div>
+        </button>`;
+};
+
+/**
+ * Inject the CSS string to the head of the document
+ *
+ * @param {string} cssText the css to inject
+ */
+const injectCSS = (cssText)=> {
+  // Create the css
+  const style = document.createElement('style');
+  style.innerHTML = cssText;
+
+  let head = document.getElementsByTagName('head')[0];
+  head.insertBefore(style, head.firstChild);
+};
+/* unused harmony export injectCSS */
+
+
+/**
+ * Generate DOM element view for button
+ *
+ * @return {HTMLElement}
+ * @param {Object} options
+ */
+const createDefaultView = (options)=> {
+  const fontSize = options.height / 3;
+  if (options.injectCSS) {
+    // Check that css isnt already injected
+    if (!_WEBVR_UI_CSS_INJECTED[options.cssprefix]) {
+      injectCSS(generateCSS(options, fontSize));
+      _WEBVR_UI_CSS_INJECTED[options.cssprefix] = true;
+    }
+  }
+
+  const el = document.createElement('div');
+  el.innerHTML = generateInnerHTML(options.cssprefix, fontSize);
+  return el.firstChild;
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = createDefaultView;
+
+
+
+const createVRIcon = (cssPrefix, height)=>{
+  const el = document.createElement('div');
+  el.innerHTML = generateVRIconString(cssPrefix, height);
+  return el.firstChild;
+};
+/* unused harmony export createVRIcon */
+
+
+const createNoVRIcon = (cssPrefix, height)=>{
+  const el = document.createElement('div');
+  el.innerHTML = generateNoVRIconString(cssPrefix, height);
+  return el.firstChild;
+};
+/* unused harmony export createNoVRIcon */
+
+
+
+const generateVRIconString = (cssPrefix, height)=> {
+    let aspect = 28 / 18;
+    return `<svg class="${cssPrefix}-svg" version="1.1" x="0px" y="0px" 
+        width="${aspect * height}px" height="${height}px" viewBox="0 0 28 18" xml:space="preserve">
+        <path d="M26.8,1.1C26.1,0.4,25.1,0,24.2,0H3.4c-1,0-1.7,0.4-2.4,1.1C0.3,1.7,0,2.7,0,3.6v10.7
+        c0,1,0.3,1.9,0.9,2.6C1.6,17.6,2.4,18,3.4,18h5c0.7,0,1.3-0.2,1.8-0.5c0.6-0.3,1-0.8,1.3-1.4l
+        1.5-2.6C13.2,13.1,13,13,14,13v0h-0.2 h0c0.3,0,0.7,0.1,0.8,0.5l1.4,2.6c0.3,0.6,0.8,1.1,1.3,
+        1.4c0.6,0.3,1.2,0.5,1.8,0.5h5c1,0,2-0.4,2.7-1.1c0.7-0.7,1.2-1.6,1.2-2.6 V3.6C28,2.7,27.5,
+        1.7,26.8,1.1z M7.4,11.8c-1.6,0-2.8-1.3-2.8-2.8c0-1.6,1.3-2.8,2.8-2.8c1.6,0,2.8,1.3,2.8,2.8
+        C10.2,10.5,8.9,11.8,7.4,11.8z M20.1,11.8c-1.6,0-2.8-1.3-2.8-2.8c0-1.6,1.3-2.8,2.8-2.8C21.7
+        ,6.2,23,7.4,23,9 C23,10.5,21.7,11.8,20.1,11.8z"/>
+    </svg>`;
+};
+
+const generateNoVRIconString = (cssPrefix, height)=>{
+    let aspect = 28 / 18;
+    return `<svg class="${cssPrefix}-svg-error" x="0px" y="0px" 
+        width="${aspect * height}px" height="${aspect * height}px" viewBox="0 0 28 28" xml:space="preserve">
+        <path d="M17.6,13.4c0-0.2-0.1-0.4-0.1-0.6c0-1.6,1.3-2.8,2.8-2.8s2.8,1.3,2.8,2.8s-1.3,2.8-2.8,2.8
+        c-0.2,0-0.4,0-0.6-0.1l5.9,5.9c0.5-0.2,0.9-0.4,1.3-0.8
+        c0.7-0.7,1.1-1.6,1.1-2.5V7.4c0-1-0.4-1.9-1.1-2.5c-0.7-0.7-1.6-1-2.5-1
+        H8.1 L17.6,13.4z"/>
+        <path d="M10.1,14.2c-0.5,0.9-1.4,1.4-2.4,1.4c-1.6,0-2.8-1.3-2.8-2.8c0-1.1,0.6-2,1.4-2.5
+        L0.9,5.1 C0.3,5.7,0,6.6,0,7.5v10.7c0,1,0.4,1.8,1.1,2.5c0.7,0.7,1.6,1,2.5,1
+        h5c0.7,0,1.3-0.1,1.8-0.5c0.6-0.3,1-0.8,1.3-1.4l1.3-2.6 L10.1,14.2z"/>
+        <path d="M25.5,27.5l-25-25C-0.1,2-0.1,1,0.5,0.4l0,0C1-0.1,2-0.1,2.6,0.4l25,25c0.6,0.6,0.6,1.5
+        ,0,2.1l0,0 C27,28.1,26,28.1,25.5,27.5z"/>
+    </svg>`;
+};
+
+/**
+ * Generate the CSS string to inject
+ *
+ * @param {Object} options
+ * @param {Number} [fontSize=18]
+ * @return {string}
+ */
+const generateCSS = (options, fontSize=18)=> {
+  const height = options.height;
+  const borderWidth = 2;
+  const borderColor = options.background ? options.background : options.color;
+  const cssPrefix = options.cssprefix;
+
+  let borderRadius;
+  if (options.corners == 'round') {
+    borderRadius = options.height / 2;
+  } else if (options.corners == 'square') {
+    borderRadius = 2;
+  } else {
+    borderRadius = options.corners;
+  }
+
+  return (`
+    @font-face {
+        font-family: 'Karla';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Karla'), local('Karla-Regular'), 
+             url(https://fonts.gstatic.com/s/karla/v5/31P4mP32i98D9CEnGyeX9Q.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+        font-family: 'Karla';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Karla'), local('Karla-Regular'), 
+             url(https://fonts.gstatic.com/s/karla/v5/Zi_e6rBgGqv33BWF8WTq8g.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, 
+                       U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+    }
+
+    button.${cssPrefix}-button {
+        font-family: 'Karla', sans-serif;
+
+        border: ${borderColor} ${borderWidth}px solid;
+        border-radius: ${borderRadius}px;
+        box-sizing: border-box;
+        background: ${options.background ? options.background : 'none'};
+
+        height: ${height}px;
+        min-width: ${fontSize * 9.6}px;
+        display: inline-block;
+        position: relative;
+
+        cursor: pointer;
+    }
+    
+    button.${cssPrefix}-button:focus {
+      outline: none;
+    }
+
+    /*
+    * Logo
+    */
+
+    .${cssPrefix}-logo {
+        width: ${height}px;
+        height: ${height}px;
+        position: absolute;
+        top:0px;
+        left:0px;
+        width: ${height - 4}px;
+        height: ${height - 4}px;
+    }
+    .${cssPrefix}-svg {
+        fill: ${options.color};
+        margin-top: ${(height - fontSize * _LOGO_SCALE) / 2 - 2}px;
+        margin-left: ${height / 3 }px;
+    }
+    .${cssPrefix}-svg-error {
+        fill: ${options.color};
+        display:none;
+        margin-top: ${(height - 28 / 18 * fontSize * _LOGO_SCALE) / 2 - 2}px;
+        margin-left: ${height / 3 }px;
+    }
+
+
+    /*
+    * Title
+    */
+
+    .${cssPrefix}-title {
+        color: ${options.color};
+        position: relative;
+        font-size: ${fontSize}px;
+        padding-left: ${height * 1.05}px;
+        padding-right: ${(borderRadius - 10 < 5) ? height / 3 : borderRadius - 10}px;
+    }
+
+    /*
+    * disabled
+    */
+
+    button.${cssPrefix}-button[disabled=true] {
+        opacity: ${options.disabledOpacity};
+    }
+
+    button.${cssPrefix}-button[disabled=true] > .${cssPrefix}-logo > .${cssPrefix}-svg {
+        display:none;
+    }
+
+    button.${cssPrefix}-button[disabled=true] > .${cssPrefix}-logo > .${cssPrefix}-svg-error {
+        display:initial;
+    }
+  `);
+};
+/* unused harmony export generateCSS */
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__webvr_manager__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dom__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__states__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_eventemitter3__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_eventemitter3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_eventemitter3__);
+// Copyright 2016 Google Inc.
+//
+//     Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+//     You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+//     Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+//     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//     See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+
+
+/**
+ * A button to allow easy-entry and messaging around a WebVR experience
+ * @class
+ */
+class EnterVRButton extends __WEBPACK_IMPORTED_MODULE_3_eventemitter3___default.a {
+  /**
+   * Construct a new Enter VR Button
+   * @constructor
+   * @param {HTMLCanvasElement} sourceCanvas the canvas that you want to present in WebVR
+   * @param {Object} [options] optional parameters
+   * @param {HTMLElement} [options.domElement] provide your own domElement to bind to
+   * @param {Boolean} [options.injectCSS=true] set to false if you want to write your own styles
+   * @param {Function} [options.beforeEnter] should return a promise, opportunity to intercept request to enter
+   * @param {Function} [options.beforeExit] should return a promise, opportunity to intercept request to exit
+   * @param {Function} [options.onRequestStateChange] set to a function returning false to prevent default state changes
+   * @param {string} [options.textEnterVRTitle] set the text for Enter VR
+   * @param {string} [options.textVRNotFoundTitle] set the text for when a VR display is not found
+   * @param {string} [options.textExitVRTitle] set the text for exiting VR
+   * @param {string} [options.color] text and icon color
+   * @param {string} [options.background] set to false for no brackground or a color
+   * @param {string} [options.corners] set to 'round', 'square' or pixel value representing the corner radius
+   * @param {string} [options.disabledOpacity] set opacity of button dom when disabled
+   * @param {string} [options.cssprefix] set to change the css prefix from default 'webvr-ui'
+   */
+  constructor(sourceCanvas, options) {
+    super();
+    options = options || {};
+
+    options.color = options.color || 'rgb(80,168,252)';
+    options.background = options.background || false;
+    options.disabledOpacity = options.disabledOpacity || 0.5;
+    options.height = options.height || 55;
+    options.corners = options.corners || 'square';
+    options.cssprefix = options.cssprefix || 'webvr-ui';
+
+    options.textEnterVRTitle = options.textEnterVRTitle || 'ENTER VR';
+    options.textVRNotFoundTitle = options.textVRNotFoundTitle || 'VR NOT FOUND';
+    options.textExitVRTitle = options.textExitVRTitle || 'EXIT VR';
+
+    options.onRequestStateChange = options.onRequestStateChange || (() => true);
+    options.beforeEnter = options.beforeEnter || (()=> new Promise((resolve)=> resolve()));
+    options.beforeExit = options.beforeExit || (()=> new Promise((resolve)=> resolve()));
+
+    options.injectCSS = options.injectCSS !== false;
+
+    this.options = options;
+
+
+    this.sourceCanvas = sourceCanvas;
+
+    // Pass in your own domElement if you really dont want to use ours
+    this.domElement = options.domElement || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__dom__["a" /* createDefaultView */])(options);
+    this.__defaultDisplayStyle = this.domElement.style.display || 'initial';
+
+    // Create WebVR Manager
+    this.manager = new __WEBPACK_IMPORTED_MODULE_0__webvr_manager__["a" /* default */]();
+    this.manager.checkDisplays();
+    this.manager.addListener('change', (state)=> this.__onStateChange(state));
+
+    // Bind button click events to __onClick
+    this.domElement.addEventListener('click', ()=> this.__onEnterVRClick());
+
+    this.__forceDisabled = false;
+    this.setTitle(this.options.textEnterVRTitle);
+  }
+
+  /**
+   * Set the title of the button
+   * @param {string} text
+   * @return {EnterVRButton}
+   */
+  setTitle(text) {
+    this.domElement.title = text;
+    ifChild(this.domElement, this.options.cssprefix, 'title', (title)=> {
+      if (!text) {
+        title.style.display = 'none';
+      } else {
+        title.innerText = text;
+        title.style.display = 'initial';
+      }
+    });
+
+    return this;
+  }
+
+  /**
+   * Set the tooltip of the button
+   * @param {string} tooltip
+   * @return {EnterVRButton}
+   */
+  setTooltip(tooltip) {
+    this.domElement.title = tooltip;
+    return this;
+  }
+
+  /**
+   * Show the button
+   * @return {EnterVRButton}
+   */
+  show() {
+    this.domElement.style.display = this.__defaultDisplayStyle;
+    this.emit('show');
+    return this;
+  }
+
+  /**
+   * Hide the button
+   * @return {EnterVRButton}
+   */
+  hide() {
+    this.domElement.style.display = 'none';
+    this.emit('hide');
+    return this;
+  }
+
+  /**
+   * Enable the button
+   * @return {EnterVRButton}
+   */
+  enable() {
+    this.__setDisabledAttribute(false);
+    this.__forceDisabled = false;
+    return this;
+  }
+
+  /**
+   * Disable the button from being clicked
+   * @return {EnterVRButton}
+   */
+  disable() {
+    this.__setDisabledAttribute(true);
+    this.__forceDisabled = true;
+    return this;
+  }
+
+  /**
+   * clean up object for garbage collection
+   */
+  remove() {
+    this.manager.remove();
+
+    if (this.domElement.parentElement) {
+      this.domElement.parentElement.removeChild(this.domElement);
+    }
+  }
+
+  /**
+   * Returns a promise getting the VRDisplay used
+   * @return {Promise.<VRDisplay>}
+   */
+  getVRDisplay() {
+    return __WEBPACK_IMPORTED_MODULE_0__webvr_manager__["a" /* default */].getVRDisplay();
+  }
+
+  /**
+   * Check if the canvas the button is connected to is currently presenting
+   * @return {boolean}
+   */
+  isPresenting() {
+    return this.state === __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING || this.state == __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING_FULLSCREEN;
+  }
+
+  /**
+   * Request entering VR
+   * @return {Promise}
+   */
+  requestEnterVR() {
+    return new Promise((resolve, reject)=> {
+      if (this.options.onRequestStateChange(__WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING)) {
+        return this.options.beforeEnter()
+          .then(()=> this.manager.enterVR(this.manager.defaultDisplay, this.sourceCanvas))
+          .then(resolve);
+      } else {
+        reject(new Error(__WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].ERROR_REQUEST_STATE_CHANGE_REJECTED));
+      }
+    });
+  }
+
+  /**
+   * Request exiting presentation mode
+   * @return {Promise}
+   */
+  requestExit() {
+    const initialState = this.state;
+
+    return new Promise((resolve, reject)=> {
+      if (this.options.onRequestStateChange(__WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].READY_TO_PRESENT)) {
+        return this.options.beforeExit()
+          .then(()=>
+            // if we were presenting VR, exit VR, if we are
+            // exiting fullscreen, exit fullscreen
+            initialState === __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING ?
+              this.manager.exitVR(this.manager.defaultDisplay) :
+              this.manager.exitFullscreen())
+          .then(resolve);
+      } else {
+        reject(new Error(__WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].ERROR_REQUEST_STATE_CHANGE_REJECTED));
+      }
+    });
+  }
+
+  /**
+   * Request entering the site in fullscreen, but not VR
+   * @return {Promise}
+   */
+  requestEnterFullscreen() {
+    return new Promise((resolve, reject)=> {
+      if (this.options.onRequestStateChange(__WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING_FULLSCREEN)) {
+        return this.options.beforeEnter()
+          .then(()=>this.manager.enterFullscreen(this.sourceCanvas))
+          .then(resolve);
+      } else {
+        reject(new Error(__WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].ERROR_REQUEST_STATE_CHANGE_REJECTED));
+      }
+    });
+  }
+
+  /**
+   * Set the disabled attribute
+   * @param {boolean} disabled
+   * @private
+   */
+  __setDisabledAttribute(disabled) {
+    if (disabled || this.__forceDisabled) {
+      this.domElement.setAttribute('disabled', 'true');
+    } else {
+      this.domElement.removeAttribute('disabled');
+    }
+  }
+
+  /**
+   * Handling click event from button
+   * @private
+   */
+  __onEnterVRClick() {
+    if (this.state == __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].READY_TO_PRESENT) {
+      this.requestEnterVR();
+    } else if (this.isPresenting()) {
+      this.requestExit();
+    }
+  }
+
+  /**
+   * @param {State} state the state that its transitioning to
+   * @private
+   */
+  __onStateChange(state) {
+    if (state != this.state) {
+      if (this.state === __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING || this.state === __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING_FULLSCREEN) {
+        this.emit('exit');
+      }
+      this.state = state;
+
+      switch (state) {
+        case __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].READY_TO_PRESENT:
+          this.show();
+          this.setTitle(this.options.textEnterVRTitle);
+          if (this.manager.defaultDisplay) {
+            this.setTooltip('Enter VR using ' + this.manager.defaultDisplay.displayName);
+          }
+          this.__setDisabledAttribute(false);
+          this.emit('ready');
+          break;
+
+        case __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING:
+        case __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING_FULLSCREEN:
+          if (!this.manager.defaultDisplay ||
+            !this.manager.defaultDisplay.capabilities.hasExternalDisplay ||
+            state == __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].PRESENTING_FULLSCREEN) {
+            this.hide();
+          }
+          this.setTitle(this.options.textExitVRTitle);
+          this.__setDisabledAttribute(false);
+          this.emit('enter');
+          break;
+
+        // Error states
+        case __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].ERROR_BROWSER_NOT_SUPPORTED:
+          this.show();
+          this.setTitle(this.options.textVRNotFoundTitle);
+          this.setTooltip('Browser not supported');
+          this.__setDisabledAttribute(true);
+          this.emit('error', new Error(state));
+          break;
+
+        case __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].ERROR_NO_PRESENTABLE_DISPLAYS:
+          this.show();
+          this.setTitle(this.options.textVRNotFoundTitle);
+          this.setTooltip('No VR headset found.');
+          this.__setDisabledAttribute(true);
+          this.emit('error', new Error(state));
+          break;
+
+        case __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].ERROR_REQUEST_TO_PRESENT_REJECTED:
+          this.show();
+          this.setTitle(this.options.textVRNotFoundTitle);
+          this.setTooltip('Something went wrong trying to start presenting to your headset.');
+          this.__setDisabledAttribute(true);
+          this.emit('error', new Error(state));
+          break;
+
+        case __WEBPACK_IMPORTED_MODULE_2__states__["a" /* default */].ERROR_EXIT_PRESENT_REJECTED:
+        default:
+          this.show();
+          this.setTitle(this.options.textVRNotFoundTitle);
+          this.setTooltip('Unknown error.');
+          this.__setDisabledAttribute(true);
+          this.emit('error', new Error(state));
+      }
+    }
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = EnterVRButton;
+
+
+/**
+ * Function checking if a specific css class exists as child of element.
+ *
+ * @param {HTMLElement} el element to find child in
+ * @param {string} cssPrefix css prefix of button
+ * @param {string} suffix class name
+ * @param {function} fn function to call if child is found
+ * @private
+ */
+const ifChild = (el, cssPrefix, suffix, fn)=> {
+  const c = el.querySelector('.' + cssPrefix + '-' + suffix);
+  c && fn(c);
+};
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__states__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_eventemitter3__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_eventemitter3___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_eventemitter3__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_screenfull__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_screenfull___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_screenfull__);
+// Copyright 2016 Google Inc.
+//
+//     Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+//     You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+//     Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+//     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//     See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+
+/**
+ * WebVR Manager is a utility to handle VR displays
+ */
+class WebVRManager extends __WEBPACK_IMPORTED_MODULE_1_eventemitter3___default.a {
+
+  /**
+   * Construct a new WebVRManager
+   */
+  constructor() {
+    super();
+    this.state = __WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].PREPARING;
+
+    // Bind vr display present change event to __onVRDisplayPresentChange
+    this.__onVRDisplayPresentChange = this.__onVRDisplayPresentChange.bind(this);
+    window.addEventListener('vrdisplaypresentchange', this.__onVRDisplayPresentChange);
+
+    this.__onChangeFullscreen = this.__onChangeFullscreen.bind(this);
+    if (__WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.enabled) {
+      document.addEventListener(__WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.raw.fullscreenchange, this.__onChangeFullscreen);
+    }
+  }
+
+  /**
+   * Check if the browser is compatible with WebVR and has headsets.
+   * @return {Promise<VRDisplay>}
+   */
+  checkDisplays() {
+    return WebVRManager.getVRDisplay()
+      .then((display) => {
+        this.defaultDisplay = display;
+        this.__setState(__WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].READY_TO_PRESENT);
+        return display;
+      })
+      .catch((e) => {
+        delete this.defaultDisplay;
+        if (e.name == 'NO_DISPLAYS') {
+          this.__setState(__WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].ERROR_NO_PRESENTABLE_DISPLAYS);
+        } else if (e.name == 'WEBVR_UNSUPPORTED') {
+          this.__setState(__WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].ERROR_BROWSER_NOT_SUPPORTED);
+        } else {
+          this.__setState(__WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].ERROR_UNKOWN);
+        }
+      });
+  }
+
+  /**
+   * clean up object for garbage collection
+   */
+  remove() {
+    window.removeEventListener('vrdisplaypresentchange', this.__onVRDisplayPresentChange);
+    if (__WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.enabled) {
+      document.removeEventListener(__WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.raw.fullscreenchanged, this.__onChangeFullscreen);
+    }
+
+    this.removeAllListeners();
+  }
+
+  /**
+   * returns promise returning list of available VR displays.
+   * @return {Promise<VRDisplay>}
+   */
+  static getVRDisplay() {
+    return new Promise((resolve, reject) => {
+      if (!navigator || !navigator.getVRDisplays) {
+        let e = new Error('Browser not supporting WebVR');
+        e.name = 'WEBVR_UNSUPPORTED';
+        reject(e);
+        return;
+      }
+
+      const rejectNoDisplay = ()=> {
+        // No displays are found.
+        let e = new Error('No displays found');
+        e.name = 'NO_DISPLAYS';
+        reject(e);
+      };
+
+      navigator.getVRDisplays().then(
+        function(displays) {
+          // Promise succeeds, but check if there are any displays actually.
+          for (let i = 0; i < displays.length; i++) {
+            if (displays[i].capabilities.canPresent) {
+              resolve(displays[i]);
+              break;
+            }
+          }
+
+          rejectNoDisplay();
+        },
+        rejectNoDisplay);
+    });
+  }
+
+  /**
+   * Enter presentation mode with your set VR display
+   * @param {VRDisplay} display the display to request present on
+   * @param {HTMLCanvasElement} canvas
+   * @return {Promise.<TResult>}
+   */
+  enterVR(display, canvas) {
+    this.presentedSource = canvas;
+    return display.requestPresent([{
+      source: canvas,
+    }])
+      .then(
+        ()=> {},
+        // this could fail if:
+        // 1. Display `canPresent` is false
+        // 2. Canvas is invalid
+        // 3. not executed via user interaction
+        ()=> this.__setState(__WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].ERROR_REQUEST_TO_PRESENT_REJECTED)
+      );
+  }
+
+  /**
+   * Exit presentation mode on display
+   * @param {VRDisplay} display
+   * @return {Promise.<TResult>}
+   */
+  exitVR(display) {
+    return display.exitPresent()
+      .then(
+        ()=> {
+          this.presentedSource = undefined;
+        },
+        // this could fail if:
+        // 1. exit requested while not currently presenting
+        ()=> this.__setState(__WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].ERROR_EXIT_PRESENT_REJECTED)
+      );
+  }
+
+  /**
+   * Enter fullscreen mode
+   * @param {HTMLCanvasElement} canvas
+   * @return {boolean}
+   */
+  enterFullscreen(canvas) {
+    if (__WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.enabled) {
+      __WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.request(canvas);
+    } else {
+      // iOS
+      this.__setState(__WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].PRESENTING_FULLSCREEN);
+    }
+    return true;
+  }
+
+  /**
+   * Exit fullscreen mode
+   * @return {boolean}
+   */
+  exitFullscreen() {
+    if (__WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.enabled && __WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.isFullscreen) {
+      __WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.exit();
+    } else if (this.state == __WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].PRESENTING_FULLSCREEN) {
+      this.checkDisplays();
+    }
+    return true;
+  }
+
+  /**
+   * Change the state of the manager
+   * @param {State} state
+   * @private
+   */
+  __setState(state) {
+    if (state != this.state) {
+      this.emit('change', state, this.state);
+      this.state = state;
+    }
+  }
+
+  /**
+   * Triggered on fullscreen change event
+   * @param {Event} e
+   * @private
+   */
+  __onChangeFullscreen(e) {
+    if (__WEBPACK_IMPORTED_MODULE_2_screenfull___default.a.isFullscreen) {
+      if(this.state != __WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].PRESENTING) {
+        this.__setState(__WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].PRESENTING_FULLSCREEN);
+      }
+    } else {
+      this.checkDisplays();
+    }
+  }
+
+  /**
+   * Triggered on vr present change
+   * @param {Event} event
+   * @private
+   */
+  __onVRDisplayPresentChange(event) {
+    try {
+      let display;
+      if(event.display) {
+        // In chrome its supplied on the event
+        display = event.display;
+      } else if(event.detail && event.detail.display) {
+        // Polyfill stores display under detail
+        display = event.detail.display;
+      }
+
+      if(display && display.isPresenting && display.getLayers()[0].source !== this.presentedSource) {
+        // this means a different instance of WebVRManager has requested to present
+        return;
+      }
+
+      const isPresenting = this.defaultDisplay && this.defaultDisplay.isPresenting;
+      this.__setState(isPresenting ? __WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].PRESENTING : __WEBPACK_IMPORTED_MODULE_0__states__["a" /* default */].READY_TO_PRESENT);
+    } catch(err) {
+      // continue regardless of error
+    }
+  }
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = WebVRManager;
+
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three__ = __webpack_require__(0);
 /**
  * @author qiao / https://github.com/qiao
@@ -43448,7 +44670,7 @@ __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"] = function ( object, domEle
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
 	// Mouse buttons
-	this.mouseButtons = { ORBIT: __WEBPACK_IMPORTED_MODULE_0_three__["_37" /* MOUSE */].LEFT, ZOOM: __WEBPACK_IMPORTED_MODULE_0_three__["_37" /* MOUSE */].MIDDLE, PAN: __WEBPACK_IMPORTED_MODULE_0_three__["_37" /* MOUSE */].RIGHT };
+	this.mouseButtons = { ORBIT: __WEBPACK_IMPORTED_MODULE_0_three__["_38" /* MOUSE */].LEFT, ZOOM: __WEBPACK_IMPORTED_MODULE_0_three__["_38" /* MOUSE */].MIDDLE, PAN: __WEBPACK_IMPORTED_MODULE_0_three__["_38" /* MOUSE */].RIGHT };
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -43492,11 +44714,11 @@ __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"] = function ( object, domEle
 		var offset = new __WEBPACK_IMPORTED_MODULE_0_three__["q" /* Vector3 */]();
 
 		// so camera.up is the orbit axis
-		var quat = new __WEBPACK_IMPORTED_MODULE_0_three__["_38" /* Quaternion */]().setFromUnitVectors( object.up, new __WEBPACK_IMPORTED_MODULE_0_three__["q" /* Vector3 */]( 0, 1, 0 ) );
+		var quat = new __WEBPACK_IMPORTED_MODULE_0_three__["_39" /* Quaternion */]().setFromUnitVectors( object.up, new __WEBPACK_IMPORTED_MODULE_0_three__["q" /* Vector3 */]( 0, 1, 0 ) );
 		var quatInverse = quat.clone().inverse();
 
 		var lastPosition = new __WEBPACK_IMPORTED_MODULE_0_three__["q" /* Vector3 */]();
-		var lastQuaternion = new __WEBPACK_IMPORTED_MODULE_0_three__["_38" /* Quaternion */]();
+		var lastQuaternion = new __WEBPACK_IMPORTED_MODULE_0_three__["_39" /* Quaternion */]();
 
 		return function update() {
 
@@ -43619,8 +44841,8 @@ __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"] = function ( object, domEle
 	var EPS = 0.000001;
 
 	// current position in spherical coordinates
-	var spherical = new __WEBPACK_IMPORTED_MODULE_0_three__["_39" /* Spherical */]();
-	var sphericalDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["_39" /* Spherical */]();
+	var spherical = new __WEBPACK_IMPORTED_MODULE_0_three__["_40" /* Spherical */]();
+	var sphericalDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["_40" /* Spherical */]();
 
 	var scale = 1;
 	var panOffset = new __WEBPACK_IMPORTED_MODULE_0_three__["q" /* Vector3 */]();
@@ -44262,7 +45484,7 @@ __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"] = function ( object, domEle
 
 };
 
-__WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].prototype = Object.create( __WEBPACK_IMPORTED_MODULE_0_three__["_40" /* EventDispatcher */].prototype );
+__WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].prototype = Object.create( __WEBPACK_IMPORTED_MODULE_0_three__["_41" /* EventDispatcher */].prototype );
 __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].prototype.constructor = __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"];
 
 Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].prototype, {
@@ -44393,7 +45615,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 /* harmony default export */ __webpack_exports__["a"] = __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"];
 
 /***/ }),
-/* 2 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44577,7 +45799,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 
 /***/ }),
-/* 3 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44703,12 +45925,17 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			var eyeWidth = eyeParamsL.renderWidth;
 			var eyeHeight = eyeParamsL.renderHeight;
 
+			// debugger;
+
 			if ( ! wasPresenting ) {
 
 				rendererPixelRatio = renderer.getPixelRatio();
 				rendererSize = renderer.getSize();
 
 				renderer.setPixelRatio( 1 );
+
+				console.log("setting size to " + eyeWidth + " * 2, " + eyeHeight );
+
 				renderer.setSize( eyeWidth * 2, eyeHeight, false );
 
 			}
@@ -44716,6 +45943,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 		} else if ( wasPresenting ) {
 
 			renderer.setPixelRatio( rendererPixelRatio );
+			console.log("setting size to " + rendererSize.width + ", " + rendererSize.height );
 			renderer.setSize( rendererSize.width, rendererSize.height, rendererUpdateStyle );
 
 		}
@@ -44832,6 +46060,11 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 			var eyeParamsR = vrDisplay.getEyeParameters( 'right' );
 
+			// console.log("left");
+			// console.log(eyeParamsL);
+			// console.log("right");
+			// console.log(eyeParamsR);
+
 			eyeTranslationL.fromArray( eyeParamsL.offset );
 			eyeTranslationR.fromArray( eyeParamsR.offset );
 
@@ -44845,6 +46078,8 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			// When rendering we don't care what the recommended size is, only what the actual size
 			// of the backbuffer is.
 			var size = renderer.getSize();
+			// console.log("render size ");
+			// console.log(size);
 			var layers = vrDisplay.getLayers();
 			var leftBounds;
 			var rightBounds;
@@ -44900,7 +46135,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			cameraR.translateOnAxis( eyeTranslationR, scale );
 
 			if ( vrDisplay.getFrameData ) {
-
+				// console.log("updating from framedata");
 				vrDisplay.depthNear = camera.near;
 				vrDisplay.depthFar = camera.far;
 
@@ -44910,7 +46145,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 				cameraR.projectionMatrix.elements = frameData.rightProjectionMatrix;
 
 			} else {
-
+				// console.log("updating without framedata");
 				cameraL.projectionMatrix = fovToProjection( eyeParamsL.fieldOfView, true, camera.near, camera.far );
 				cameraR.projectionMatrix = fovToProjection( eyeParamsR.fieldOfView, true, camera.near, camera.far );
 
@@ -45064,7 +46299,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 
 /***/ }),
-/* 4 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45208,15 +46443,6 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			},
 
 			update: function ( scene, camera ) {
-
-				// update scene graph
-
-				scene.updateMatrixWorld();
-
-				// update camera matrices and frustum
-
-				camera.updateMatrixWorld();
-				camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 				for ( var name in objects ) {
 
@@ -45373,7 +46599,8 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 		this.lights = {};
 
-		var lights = json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].lights;
+		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) || {};
+		var lights = extension.lights || {};
 
 		for ( var lightId in lights ) {
 
@@ -45640,18 +46867,31 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			results = [];
 
 			var length = object.length;
+
 			for ( var idx = 0; idx < length; idx ++ ) {
+
 				var value = callback.call( thisObj || this, object[ idx ], idx );
+
 				if ( value ) {
+
 					fns.push( value );
+
 					if ( value instanceof Promise ) {
+
 						value.then( function( key, value ) {
-							results[ idx ] = value;
-						}.bind( this, key ));
+
+							results[ key ] = value;
+
+						}.bind( this, idx ));
+
 					} else {
+
 						results[ idx ] = value;
+
 					}
+
 				}
+
 			}
 
 		} else {
@@ -45659,25 +46899,41 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			results = {};
 
 			for ( var key in object ) {
+
 				if ( object.hasOwnProperty( key ) ) {
+
 					var value = callback.call( thisObj || this, object[ key ], key );
+
 					if ( value ) {
+
 						fns.push( value );
+
 						if ( value instanceof Promise ) {
+
 							value.then( function( key, value ) {
+
 								results[ key ] = value;
+
 							}.bind( this, key ));
+
 						} else {
+
 							results[ key ] = value;
+
 						}
+
 					}
+
 				}
+
 			}
 
 		}
 
 		return Promise.all( fns ).then( function() {
+
 			return results;
+
 		});
 
 	}
@@ -45688,8 +46944,8 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 		if ( typeof url !== 'string' || url === '' )
 			return '';
 
-		// Absolute URL
-		if ( /^https?:\/\//i.test( url ) ) {
+		// Absolute URL http://,https://,//
+		if ( /^(https?:)?\/\//i.test( url ) ) {
 
 			return url;
 
@@ -46050,7 +47306,9 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 				var arraybuffer = dependencies.buffers[ bufferView.buffer ];
 
-				return arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+				var byteLength = bufferView.byteLength !== undefined ? bufferView.byteLength : 0;
+
+				return arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + byteLength );
 
 			} );
 
@@ -46161,10 +47419,10 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 								var sampler = json.samplers[ texture.sampler ];
 
-								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ];
-								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ];
-								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ];
-								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ];
+								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || __WEBPACK_IMPORTED_MODULE_0_three__["u" /* LinearFilter */];
+								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || __WEBPACK_IMPORTED_MODULE_0_three__["x" /* NearestMipMapLinearFilter */];
+								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || __WEBPACK_IMPORTED_MODULE_0_three__["B" /* RepeatWrapping */];
+								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || __WEBPACK_IMPORTED_MODULE_0_three__["B" /* RepeatWrapping */];
 
 							}
 
@@ -46213,15 +47471,20 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 				if ( khr_material ) {
 
+					// don't copy over unused values to avoid material warning spam
+					var keys = [ 'ambient', 'emission', 'transparent', 'transparency', 'doubleSided' ];
+
 					switch ( khr_material.technique ) {
 
 						case 'BLINN' :
 						case 'PHONG' :
 							materialType = __WEBPACK_IMPORTED_MODULE_0_three__["_10" /* MeshPhongMaterial */];
+							keys.push( 'diffuse', 'specular', 'shininess' );
 							break;
 
 						case 'LAMBERT' :
 							materialType = __WEBPACK_IMPORTED_MODULE_0_three__["_17" /* MeshLambertMaterial */];
+							keys.push( 'diffuse' );
 							break;
 
 						case 'CONSTANT' :
@@ -46231,7 +47494,11 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 					}
 
-					Object.assign( materialValues, khr_material.values );
+					keys.forEach( function( v ) {
+
+						if ( khr_material.values[ v ] !== undefined ) materialValues[ v ] = khr_material.values[ v ];
+
+					} );
 
 					if ( khr_material.doubleSided || materialValues.doubleSided ) {
 
@@ -46623,7 +47890,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 				if ( mesh.extras ) group.userData = mesh.extras;
 
-				var primitives = mesh.primitives;
+				var primitives = mesh.primitives || [];
 
 				for ( var name in primitives ) {
 
@@ -46699,7 +47966,6 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 						var attributes = primitive.attributes;
 
-
 						for ( var attributeId in attributes ) {
 
 							var attributeEntry = attributes[ attributeId ];
@@ -46771,18 +48037,13 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			if ( camera.type == "perspective" && camera.perspective ) {
 
 				var yfov = camera.perspective.yfov;
-				var xfov = camera.perspective.xfov;
-				var aspect_ratio = camera.perspective.aspect_ratio || 1;
+				var aspectRatio = camera.perspective.aspectRatio !== undefined ? camera.perspective.aspectRatio : 1;
 
 				// According to COLLADA spec...
-				// aspect_ratio = xfov / yfov
-				xfov = ( xfov === undefined && yfov ) ? yfov * aspect_ratio : xfov;
+				// aspectRatio = xfov / yfov
+				var xfov = yfov * aspectRatio;
 
-				// According to COLLADA spec...
-				// aspect_ratio = xfov / yfov
-				// yfov = ( yfov === undefined && xfov ) ? xfov / aspect_ratio : yfov;
-
-				var _camera = new __WEBPACK_IMPORTED_MODULE_0_three__["a" /* PerspectiveCamera */]( __WEBPACK_IMPORTED_MODULE_0_three__["_27" /* Math */].radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
+				var _camera = new __WEBPACK_IMPORTED_MODULE_0_three__["a" /* PerspectiveCamera */]( __WEBPACK_IMPORTED_MODULE_0_three__["_27" /* Math */].radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
 				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
@@ -46816,8 +48077,12 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 			return _each( json.skins, function ( skin ) {
 
+				var bindShapeMatrix = new __WEBPACK_IMPORTED_MODULE_0_three__["k" /* Matrix4 */]();
+
+				if ( skin.bindShapeMatrix !== undefined ) bindShapeMatrix.fromArray( skin.bindShapeMatrix );
+
 				var _skin = {
-					bindShapeMatrix: new __WEBPACK_IMPORTED_MODULE_0_three__["k" /* Matrix4 */]().fromArray( skin.bindShapeMatrix ),
+					bindShapeMatrix: bindShapeMatrix,
 					jointNames: skin.jointNames,
 					inverseBindMatrices: dependencies.accessors[ skin.inverseBindMatrices ]
 				};
@@ -46872,6 +48137,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 								: __WEBPACK_IMPORTED_MODULE_0_three__["_30" /* VectorKeyframeTrack */];
 
 							var targetName = node.name ? node.name : node.uuid;
+							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : __WEBPACK_IMPORTED_MODULE_0_three__["_8" /* InterpolateLinear */];
 
 							// KeyframeTrack.optimize() will modify given 'times' and 'values'
 							// buffers before creating a truncated copy to keep. Because buffers may
@@ -46880,7 +48146,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 								targetName + '.' + PATH_PROPERTIES[ target.path ],
 								__WEBPACK_IMPORTED_MODULE_0_three__["_31" /* AnimationUtils */].arraySlice( inputAccessor.array, 0 ),
 								__WEBPACK_IMPORTED_MODULE_0_three__["_31" /* AnimationUtils */].arraySlice( outputAccessor.array, 0 ),
-								INTERPOLATION[ sampler.interpolation ]
+								interpolation
 							) );
 
 						}
@@ -46889,7 +48155,9 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 				}
 
-				return new __WEBPACK_IMPORTED_MODULE_0_three__["_32" /* AnimationClip */]( "animation_" + animationId, undefined, tracks );
+				var name = animation.name !== undefined ? animation.name : "animation_" + animationId;
+
+				return new __WEBPACK_IMPORTED_MODULE_0_three__["_32" /* AnimationClip */]( name, undefined, tracks );
 
 			} );
 
@@ -47010,6 +48278,10 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 										child = new __WEBPACK_IMPORTED_MODULE_0_three__["_25" /* LineSegments */]( originalGeometry, material );
 										break;
 
+									case 'LineLoop':
+										child = new __WEBPACK_IMPORTED_MODULE_0_three__["LineLoop"]( originalGeometry, material );
+										break;
+
 									case 'Line':
 										child = new __WEBPACK_IMPORTED_MODULE_0_three__["_26" /* Line */]( originalGeometry, material );
 										break;
@@ -47052,9 +48324,8 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 									var geometry = originalGeometry;
 									var material = originalMaterial;
-									material.skinning = true;
 
-									child = new __WEBPACK_IMPORTED_MODULE_0_three__["_34" /* SkinnedMesh */]( geometry, material, false );
+									child = new __WEBPACK_IMPORTED_MODULE_0_three__["_35" /* SkinnedMesh */]( geometry, material, false );
 									child.castShadow = true;
 									child.userData = originalUserData;
 									child.name = originalName;
@@ -47077,13 +48348,13 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 										} else {
 
-											console.warn( "WARNING: joint: ''" + jointId + "' could not be found" );
+											console.warn( "WARNING: joint: '" + jointId + "' could not be found" );
 
 										}
 
 									}
 
-									child.bind( new __WEBPACK_IMPORTED_MODULE_0_three__["_35" /* Skeleton */]( bones, boneInverses, false ), skinEntry.bindShapeMatrix );
+									child.bind( new __WEBPACK_IMPORTED_MODULE_0_three__["_36" /* Skeleton */]( bones, boneInverses, false ), skinEntry.bindShapeMatrix );
 
 									var buildBoneGraph = function ( parentJson, parentObject, property ) {
 
@@ -47190,7 +48461,7 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 				if ( scene.extras ) _scene.userData = scene.extras;
 
-				var nodes = scene.nodes;
+				var nodes = scene.nodes || [];
 
 				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 
@@ -47204,8 +48475,10 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 					// Register raw material meshes with GLTFLoader.Shaders
 					if ( child.material && child.material.isRawShaderMaterial ) {
 
-						var xshader = new GLTFShader( child, dependencies.nodes );
-						GLTFLoader.Shaders.add( child.uuid, xshader );
+						child.gltfShader = new GLTFShader( child, dependencies.nodes );
+						child.onBeforeRender = function(renderer, scene, camera){
+							this.gltfShader.update(scene, camera);
+						};
 
 					}
 
@@ -47223,19 +48496,309 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 } )();
 
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__webvr_manager__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__states__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dom__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__enter_vr_button__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__aframe_component__ = __webpack_require__(12);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_3__enter_vr_button__["a"]; });
+/* unused harmony reexport dom */
+/* unused harmony reexport State */
+/* unused harmony reexport WebVRManager */
+// Copyright 2016 Google Inc.
+//
+//     Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+//     You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+//     Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+//     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//     See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+
+
+
+
+
+
 
 /***/ }),
-/* 5 */,
-/* 6 */
+/* 11 */
+/***/ (function(module, exports) {
+
+/*!
+* screenfull
+* v3.0.0 - 2015-11-24
+* (c) Sindre Sorhus; MIT License
+*/
+(function () {
+	'use strict';
+
+	var isCommonjs = typeof module !== 'undefined' && module.exports;
+	var keyboardAllowed = typeof Element !== 'undefined' && 'ALLOW_KEYBOARD_INPUT' in Element;
+
+	var fn = (function () {
+		var val;
+		var valLength;
+
+		var fnMap = [
+			[
+				'requestFullscreen',
+				'exitFullscreen',
+				'fullscreenElement',
+				'fullscreenEnabled',
+				'fullscreenchange',
+				'fullscreenerror'
+			],
+			// new WebKit
+			[
+				'webkitRequestFullscreen',
+				'webkitExitFullscreen',
+				'webkitFullscreenElement',
+				'webkitFullscreenEnabled',
+				'webkitfullscreenchange',
+				'webkitfullscreenerror'
+
+			],
+			// old WebKit (Safari 5.1)
+			[
+				'webkitRequestFullScreen',
+				'webkitCancelFullScreen',
+				'webkitCurrentFullScreenElement',
+				'webkitCancelFullScreen',
+				'webkitfullscreenchange',
+				'webkitfullscreenerror'
+
+			],
+			[
+				'mozRequestFullScreen',
+				'mozCancelFullScreen',
+				'mozFullScreenElement',
+				'mozFullScreenEnabled',
+				'mozfullscreenchange',
+				'mozfullscreenerror'
+			],
+			[
+				'msRequestFullscreen',
+				'msExitFullscreen',
+				'msFullscreenElement',
+				'msFullscreenEnabled',
+				'MSFullscreenChange',
+				'MSFullscreenError'
+			]
+		];
+
+		var i = 0;
+		var l = fnMap.length;
+		var ret = {};
+
+		for (; i < l; i++) {
+			val = fnMap[i];
+			if (val && val[1] in document) {
+				for (i = 0, valLength = val.length; i < valLength; i++) {
+					ret[fnMap[0][i]] = val[i];
+				}
+				return ret;
+			}
+		}
+
+		return false;
+	})();
+
+	var screenfull = {
+		request: function (elem) {
+			var request = fn.requestFullscreen;
+
+			elem = elem || document.documentElement;
+
+			// Work around Safari 5.1 bug: reports support for
+			// keyboard in fullscreen even though it doesn't.
+			// Browser sniffing, since the alternative with
+			// setTimeout is even worse.
+			if (/5\.1[\.\d]* Safari/.test(navigator.userAgent)) {
+				elem[request]();
+			} else {
+				elem[request](keyboardAllowed && Element.ALLOW_KEYBOARD_INPUT);
+			}
+		},
+		exit: function () {
+			document[fn.exitFullscreen]();
+		},
+		toggle: function (elem) {
+			if (this.isFullscreen) {
+				this.exit();
+			} else {
+				this.request(elem);
+			}
+		},
+		raw: fn
+	};
+
+	if (!fn) {
+		if (isCommonjs) {
+			module.exports = false;
+		} else {
+			window.screenfull = false;
+		}
+
+		return;
+	}
+
+	Object.defineProperties(screenfull, {
+		isFullscreen: {
+			get: function () {
+				return Boolean(document[fn.fullscreenElement]);
+			}
+		},
+		element: {
+			enumerable: true,
+			get: function () {
+				return document[fn.fullscreenElement];
+			}
+		},
+		enabled: {
+			enumerable: true,
+			get: function () {
+				// Coerce to boolean in case of old WebKit
+				return Boolean(document[fn.fullscreenEnabled]);
+			}
+		}
+	});
+
+	if (isCommonjs) {
+		module.exports = screenfull;
+	} else {
+		window.screenfull = screenfull;
+	}
+})();
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enter_vr_button__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__states__ = __webpack_require__(1);
+// Copyright 2016 Google Inc.
+//
+//     Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+//     You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+//     Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+//     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//     See the License for the specific language governing permissions and
+// limitations under the License.
+
+/* global AFRAME */
+
+
+
+
+if (typeof AFRAME !== 'undefined' && AFRAME) {
+  AFRAME.registerComponent('webvr-ui', {
+    dependencies: ['canvas'],
+
+    schema: {
+      enabled: {type: 'boolean', default: true},
+      color: {type: 'string', default: 'white'},
+      background: {type: 'string', default: 'black'},
+      corners: {type: 'string', default: 'square'},
+      disabledOpacity: {type: 'number', default: 0.5},
+
+      textEnterVRTitle: {type: 'string'},
+      textExitVRTitle: {type: 'string'},
+      textVRNotFoundTitle: {type: 'string'},
+    },
+
+    init: function() {
+    },
+
+    update: function() {
+      let scene = document.querySelector('a-scene');
+      scene.setAttribute('vr-mode-ui', {enabled: !this.data.enabled});
+
+      if (this.data.enabled) {
+        if (this.enterVREl) {
+          return;
+        }
+
+        let options = {
+          color: this.data.color,
+          background: this.data.background,
+          corners: this.data.corners,
+          disabledOpacity: this.data.disabledOpacity,
+          textEnterVRTitle: this.data.textEnterVRTitle,
+          textExitVRTitle: this.data.textExitVRTitle,
+          textVRNotFoundTitle: this.data.textVRNotFoundTitle,
+          onRequestStateChange: function(state) {
+            if (state == __WEBPACK_IMPORTED_MODULE_1__states__["a" /* default */].PRESENTING) {
+              scene.enterVR();
+            } else {
+              scene.exitVR();
+            }
+            return false;
+          },
+        };
+
+        let enterVR = this.enterVR = new __WEBPACK_IMPORTED_MODULE_0__enter_vr_button__["a" /* default */](scene.canvas, options);
+
+        this.enterVREl = enterVR.domElement;
+
+        document.body.appendChild(enterVR.domElement);
+
+        enterVR.domElement.style.position = 'absolute';
+        enterVR.domElement.style.bottom = '10px';
+        enterVR.domElement.style.left = '50%';
+        enterVR.domElement.style.transform = 'translate(-50%, -50%)';
+        enterVR.domElement.style.textAlign = 'center';
+      } else {
+        if (this.enterVREl) {
+          this.enterVREl.parentNode.removeChild(this.enterVREl);
+          this.enterVR.remove();
+        }
+      }
+    },
+
+    remove: function() {
+      if (this.enterVREl) {
+        this.enterVREl.parentNode.removeChild(this.enterVREl);
+        this.enterVR.remove();
+      }
+    },
+  });
+}
+
+
+/***/ }),
+/* 13 */,
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controls_VRControls__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controls_OrbitControls__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__effects_VREffect__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__loaders_GLTFLoader__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controls_VRControls__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controls_OrbitControls__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__effects_VREffect__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__loaders_GLTFLoader__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_webvr_ui__ = __webpack_require__(10);
+
 
 
 
@@ -47245,52 +48808,52 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 function initializeGltfElement() {
 	var $el = jQuery(this);
 
-	var container, camera, scene, renderer, controls, mixer, vreffect;
+	var container, camera, scene, renderer, controls, mixer, vreffect, fullscreenContainer;
 
 	function addCamera() {
-		camera = new __WEBPACK_IMPORTED_MODULE_0_three__["a" /* PerspectiveCamera */]( 75, container.offsetWidth / container.offsetHeight, 1, 2000 );
+		camera = new __WEBPACK_IMPORTED_MODULE_0_three__["a" /* PerspectiveCamera */]( 40, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
 		// camera.rotation.y = Math.PI;
-		camera.position.set(0, 2, 3);
+		// camera.position.set(0, 2, 3);
+		// camera.quaternion.set(0,0,0,1);
+		camera.position.set(0, 5, 3);
+		// camera.position.set(0, controls.userHeight, 0);
 		scene.add( camera );
 	}
 
 	function addLights() {
 		// var ambient = new THREE.AmbientLight( 0x101030 );
 		var ambient = new __WEBPACK_IMPORTED_MODULE_0_three__["b" /* AmbientLight */]( 0xFFFFFF, 1 );
-	    scene.add( ambient );
+		scene.add( ambient );
 
-	    var directionalLight = new __WEBPACK_IMPORTED_MODULE_0_three__["c" /* DirectionalLight */]( 0xffeedd );
-	    directionalLight.position.set( 0, 0, 1 );
-	    scene.add( directionalLight );
+		var directionalLight = new __WEBPACK_IMPORTED_MODULE_0_three__["c" /* DirectionalLight */]( 0xffeedd );
+		directionalLight.position.set( 0, 0, 1 );
+		scene.add( directionalLight );
 	}
 
 	function addWebVRButton( effect ) {
-		var button = document.createElement( 'button' );
-		button.style.position = 'absolute';
-		button.style.left = 'calc(50% - 50px)';
-		button.style.bottom = '20px';
-		button.style.width = '100px';
-		button.style.border = '0';
-		button.style.padding = '8px';
-		button.style.cursor = 'pointer';
-		button.style.backgroundColor = '#000';
-		button.style.color = '#fff';
-		button.style.fontFamily = 'sans-serif';
-		button.style.fontSize = '13px';
-		button.style.fontStyle = 'normal';
-		button.style.textAlign = 'center';
-		button.style.zIndex = '999';
-		button.textContent = 'ENTER VR';
-		button.onclick = function() {
-			effect.isPresenting ? effect.exitPresent() : effect.requestPresent();
+
+		var options = {
+			color: 'white',
+			background: false,
+			corners: 'square',
 		};
-		window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
 
-			button.textContent = effect.isPresenting ? 'EXIT VR' : 'ENTER VR';
+		var enterVR = new __WEBPACK_IMPORTED_MODULE_5_webvr_ui__["a" /* EnterVRButton */](renderer.domElement, options)
+			.on("enter", function(){
+				console.log("enter VR");
+			})
+			.on("exit", function(){
+				console.log("exit VR");
+			});
 
-		}, false );
+		var buttonContainer = document.createElement( 'div' );
+		buttonContainer.style.position = 'absolute';
+		buttonContainer.style.left = 'calc(50% - 100px)';
+		buttonContainer.style.bottom = '20px';
+		buttonContainer.style.width = '200px';
+		buttonContainer.appendChild( enterVR.domElement );
 
-		container.appendChild( button );
+		container.appendChild( buttonContainer );
 	}
 
 	function addFallbackControls() {
@@ -47312,24 +48875,17 @@ function initializeGltfElement() {
 		// add WebVR controls
 		if ( navigator.getVRDisplays !== undefined ) {
 			console.log("doing VR");
+			vreffect.scale = 2.0;
 			controls = new __WEBPACK_IMPORTED_MODULE_1__controls_VRControls__["a" /* default */]( camera );
 			controls.standing = true;
 			addWebVRButton( vreffect );
-			navigator.getVRDisplays()
-				.then( function ( displays ) {
-					vreffect.setVRDisplay( displays[ 0 ] );
-					controls.setVRDisplay( displays[ 0 ] );
-				} )
-				.catch( function () {
-					// no displays
-				} );
 		} else {
 			addFallbackControls();
 		}
 	}
 
 	function addRenderer() {
-		renderer = new __WEBPACK_IMPORTED_MODULE_0_three__["d" /* WebGLRenderer */]({antialias:true});
+		renderer = new __WEBPACK_IMPORTED_MODULE_0_three__["d" /* WebGLRenderer */]({ antialias:true });
 		renderer.setClearColor( 0x222222 );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.offsetWidth, container.offsetHeight );
@@ -47337,30 +48893,46 @@ function initializeGltfElement() {
 
 	function addLoadingLogger() {
 		var manager = new __WEBPACK_IMPORTED_MODULE_0_three__["e" /* LoadingManager */]();
-	    manager.onProgress = function ( item, loaded, total ) {
-	        console.log( item, loaded, total );
-	    };
+		manager.onProgress = function ( item, loaded, total ) {
+			console.log( item, loaded, total );
+		};
 	}
 
 	function onResize() {
 		console.log("resizing");
 
 		if ( vreffect.isPresenting ) {
-			var width = window.innerWidth;
-			var height = window.innerHeight;
-			camera.aspect = ( width / 2 ) / height;
+			// resize canvas container
+			// container.style.position = 'absolute';
+			// container.style.top = '0';
+			// container.style.left = '0';
+			// container.style.width = window.innerWidth + 'px';
+			// container.style.height = window.innerHeight + 'px';
+			// var size = renderer.getSize();
+			// console.log(size);
+			// var width = size.width;
+			// var height = size.height;
+			// camera.aspect = width / height;
+			// camera.updateProjectionMatrix();
+			// camera.aspect = ( width / 2 ) / height;
 		} else {
+			// container.style.position = 'inherit';
+			// container.style.width = null;
+			// container.style.height = null;
+			// container.style.top = null;
+			// container.style.left = null;
 			var width = container.offsetWidth;
 			var height = container.offsetHeight;
+			console.log("setting resolution to " + width + " by " + height );
 			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+			vreffect.setSize( width, height );
 		}
-
-		camera.updateProjectionMatrix();
-		vreffect.setSize( width, height );
 	}
 
 	function addListeners() {
-		window.addEventListener('resize', onResize);
+		window.addEventListener('resize', onResize, true);
+		window.addEventListener('vrdisplaypresentchange', onResize, true);
 	}
 
 	function loadModel( modelUrl, modelScale ) {
@@ -47371,13 +48943,13 @@ function initializeGltfElement() {
 			object.scale.set(modelScale, modelScale, modelScale);
 
 			var animations = data.animations;
-	        if ( animations && animations.length ) {
-	            mixer = new __WEBPACK_IMPORTED_MODULE_0_three__["f" /* AnimationMixer */]( object );
-	            for ( var i = 0; i < animations.length; i ++ ) {
-	                var animation = animations[ i ];
-	                mixer.clipAction( animation ).play();
-	            }
-	        }
+			if ( animations && animations.length ) {
+				mixer = new __WEBPACK_IMPORTED_MODULE_0_three__["f" /* AnimationMixer */]( object );
+				for ( var i = 0; i < animations.length; i ++ ) {
+					var animation = animations[ i ];
+					mixer.clipAction( animation ).play();
+				}
+			}
 
 			scene.add( object );
 		} );
@@ -47388,15 +48960,20 @@ function initializeGltfElement() {
 		if ( typeof mixer != "undefined" ) {
 			mixer.update();
 		}
-		__WEBPACK_IMPORTED_MODULE_4__loaders_GLTFLoader__["a" /* default */].Shaders.update( scene, camera );
 		vreffect.render( scene, camera );
 		controls.update();
 	}
 
 	container = $el.get(0);
+	// fullscreenContainer = 
 
 	// necessary for the enter VR button to appear in the right position
 	$el.css({'position':'relative'});
+
+	// set the height of the container so that it has the same aspect ratio
+	// as the screen
+	// var elHeight = ( window.screen.height / window.screen.width ) * $el.offsetWidth;
+	// $el.css({'height': elHeight + 'px'});
 
 	scene = new __WEBPACK_IMPORTED_MODULE_0_three__["g" /* Scene */]();
 
@@ -47407,6 +48984,11 @@ function initializeGltfElement() {
 	addLoadingLogger();
 	addListeners();
 
+	// make sure the canvas scales to full screen
+	// renderer.domElement.style.width = '100%';
+	// renderer.domElement.style.height = '100%';
+	// renderer.domElement.style.top = '0';
+
 	container.appendChild( renderer.domElement );
 
 	loadModel( $el.data( 'model' ), $el.data( 'scale' ) );
@@ -47416,6 +48998,7 @@ function initializeGltfElement() {
 
 jQuery( function() {
 	jQuery( '.gltf-model' ).each( initializeGltfElement );
+	// jQuery( 'body' ).each( initializeGltfElement );
 } );
 
 /***/ })

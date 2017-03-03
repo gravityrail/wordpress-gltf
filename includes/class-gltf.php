@@ -177,7 +177,7 @@ class Gltf {
 			'scale' => '1.0'
 		), $atts );
 
-		return '<div class="gltf-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
+		return '<div class="gltf-model" style="height: 200px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
 	}
 
 	public function register_scene_post_type() {

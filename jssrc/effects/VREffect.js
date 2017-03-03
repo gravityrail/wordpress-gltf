@@ -119,12 +119,17 @@ export default function( renderer, onError ) {
 			var eyeWidth = eyeParamsL.renderWidth;
 			var eyeHeight = eyeParamsL.renderHeight;
 
+			// debugger;
+
 			if ( ! wasPresenting ) {
 
 				rendererPixelRatio = renderer.getPixelRatio();
 				rendererSize = renderer.getSize();
 
 				renderer.setPixelRatio( 1 );
+
+				console.log("setting size to " + eyeWidth + " * 2, " + eyeHeight );
+
 				renderer.setSize( eyeWidth * 2, eyeHeight, false );
 
 			}
@@ -132,6 +137,7 @@ export default function( renderer, onError ) {
 		} else if ( wasPresenting ) {
 
 			renderer.setPixelRatio( rendererPixelRatio );
+			console.log("setting size to " + rendererSize.width + ", " + rendererSize.height );
 			renderer.setSize( rendererSize.width, rendererSize.height, rendererUpdateStyle );
 
 		}
@@ -248,6 +254,11 @@ export default function( renderer, onError ) {
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 			var eyeParamsR = vrDisplay.getEyeParameters( 'right' );
 
+			// console.log("left");
+			// console.log(eyeParamsL);
+			// console.log("right");
+			// console.log(eyeParamsR);
+
 			eyeTranslationL.fromArray( eyeParamsL.offset );
 			eyeTranslationR.fromArray( eyeParamsR.offset );
 
@@ -261,6 +272,8 @@ export default function( renderer, onError ) {
 			// When rendering we don't care what the recommended size is, only what the actual size
 			// of the backbuffer is.
 			var size = renderer.getSize();
+			// console.log("render size ");
+			// console.log(size);
 			var layers = vrDisplay.getLayers();
 			var leftBounds;
 			var rightBounds;
@@ -316,7 +329,7 @@ export default function( renderer, onError ) {
 			cameraR.translateOnAxis( eyeTranslationR, scale );
 
 			if ( vrDisplay.getFrameData ) {
-
+				// console.log("updating from framedata");
 				vrDisplay.depthNear = camera.near;
 				vrDisplay.depthFar = camera.far;
 
@@ -326,7 +339,7 @@ export default function( renderer, onError ) {
 				cameraR.projectionMatrix.elements = frameData.rightProjectionMatrix;
 
 			} else {
-
+				// console.log("updating without framedata");
 				cameraL.projectionMatrix = fovToProjection( eyeParamsL.fieldOfView, true, camera.near, camera.far );
 				cameraR.projectionMatrix = fovToProjection( eyeParamsR.fieldOfView, true, camera.near, camera.far );
 

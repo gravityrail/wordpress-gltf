@@ -19,6 +19,8 @@
   "homepage": "https://github.com/gravityrail/wordpress-gltf#readme",
   "devDependencies": {
     "three": "^0.84.0",
+    "uglify-js": "^2.8.4",
+    "uglifyjs-webpack-plugin": "^0.2.1",
     "webvr-ui": "^0.9.4"
   }
 }
