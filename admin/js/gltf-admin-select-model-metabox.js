@@ -1,7 +1,5 @@
 jQuery(function($){
 
-	// debugger;
-
   // Set all variables to be used in scope
   var frame,
 	  metaBox = $('#gltf_select_scene_model.postbox'), // Your meta box id here
@@ -26,10 +24,10 @@ jQuery(function($){
 		frame = wp.media({
 			title: 'Select a GLTF model file',
 			button: {
-			text: 'Use this model'
+				text: 'Use this model'
 			},
 			multiple: false,  // Set to true to allow multiple files to be selected
-			library : { type: 'model/gltf+json' }
+			library: { type: [ 'model/gltf+json' ] }
 		});
 
 		// When an image is selected in the media frame...

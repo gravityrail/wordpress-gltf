@@ -137,7 +137,6 @@ class Gltf {
 		add_filter( 'upload_mimes', array( $this, 'upload_mime_types' ) );
 		add_filter( 'wp_mime_type_icon', array( $this, 'mime_types_icons' ), 10, 3 );
 		add_shortcode( 'gltf_model', array( $this, 'model_shortcode' ) );
-		// add three.js if the current post has our shortcode
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_model_render_script' ) );
 		add_action( 'init', array( $this, 'register_scene_post_type' ) );
 		add_action( 'add_meta_boxes_gltf_scene', array( $this, 'add_scene_metaboxes' ) );
@@ -201,7 +200,6 @@ class Gltf {
 
 	function add_scene_metaboxes() {
 		add_meta_box( 'gltf_select_scene_model', __( 'Select Scene Model', 'gltf-media-type' ), array( $this, 'select_scene_model_callback' ), 'gltf_scene' );
-		// add_meta_box( 'scene_select_model', 'Select Model', 'swp_file_upload', 'podcasts', 'normal', 'default' );
 	}
 
 	function select_scene_model_callback( $post ) {
@@ -268,9 +266,6 @@ class Gltf {
 		}
 		if( isset( $_POST[ 'main-model-scale' ] ) ) {
 			update_post_meta( $post_id, '_gltf_main_model_scale', $_POST[ 'main-model-scale' ] );
-		}
-		if( isset( $_POST[ 'meta-radio' ] ) ) {
-			update_post_meta( $post_id, 'meta-radio', $_POST[ 'meta-radio' ] );
 		}
 	}
 

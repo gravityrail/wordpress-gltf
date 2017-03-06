@@ -154,6 +154,9 @@ function initializeGltfElement() {
 	animate();
 }
 
+// make function globally available
+window.initializeGltfElement = initializeGltfElement;
+
 jQuery( function() {
 	jQuery( '.gltf-model' ).each( initializeGltfElement );
 } );
