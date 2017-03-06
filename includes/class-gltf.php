@@ -310,8 +310,7 @@ class Gltf {
 	public function enqueue_model_render_script() {
 		global $post;
 		if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'gltf_model') ) {
-			require_once dirname( __FILE__ ) . '/class-gltf-model-utils.php';
-			Gltf_Model_Utils::enqueue_scripts( $this->version );
+			wp_enqueue_script( 'gltf-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
 		}
 	}
 

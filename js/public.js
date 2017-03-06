@@ -45934,8 +45934,6 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 
 				renderer.setPixelRatio( 1 );
 
-				console.log("setting size to " + eyeWidth + " * 2, " + eyeHeight );
-
 				renderer.setSize( eyeWidth * 2, eyeHeight, false );
 
 			}
@@ -45943,7 +45941,6 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 		} else if ( wasPresenting ) {
 
 			renderer.setPixelRatio( rendererPixelRatio );
-			console.log("setting size to " + rendererSize.width + ", " + rendererSize.height );
 			renderer.setSize( rendererSize.width, rendererSize.height, rendererUpdateStyle );
 
 		}
@@ -46060,11 +46057,6 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 			var eyeParamsR = vrDisplay.getEyeParameters( 'right' );
 
-			// console.log("left");
-			// console.log(eyeParamsL);
-			// console.log("right");
-			// console.log(eyeParamsR);
-
 			eyeTranslationL.fromArray( eyeParamsL.offset );
 			eyeTranslationR.fromArray( eyeParamsR.offset );
 
@@ -46078,8 +46070,6 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			// When rendering we don't care what the recommended size is, only what the actual size
 			// of the backbuffer is.
 			var size = renderer.getSize();
-			// console.log("render size ");
-			// console.log(size);
 			var layers = vrDisplay.getLayers();
 			var leftBounds;
 			var rightBounds;
@@ -46135,7 +46125,6 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 			cameraR.translateOnAxis( eyeTranslationR, scale );
 
 			if ( vrDisplay.getFrameData ) {
-				// console.log("updating from framedata");
 				vrDisplay.depthNear = camera.near;
 				vrDisplay.depthFar = camera.far;
 
@@ -46145,7 +46134,6 @@ Object.defineProperties( __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"].pr
 				cameraR.projectionMatrix.elements = frameData.rightProjectionMatrix;
 
 			} else {
-				// console.log("updating without framedata");
 				cameraL.projectionMatrix = fovToProjection( eyeParamsL.fieldOfView, true, camera.near, camera.far );
 				cameraR.projectionMatrix = fovToProjection( eyeParamsR.fieldOfView, true, camera.near, camera.far );
 
@@ -48812,16 +48800,11 @@ function initializeGltfElement() {
 
 	function addCamera() {
 		camera = new __WEBPACK_IMPORTED_MODULE_0_three__["a" /* PerspectiveCamera */]( 40, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
-		// camera.rotation.y = Math.PI;
-		// camera.position.set(0, 2, 3);
-		// camera.quaternion.set(0,0,0,1);
 		camera.position.set(0, 5, 3);
-		// camera.position.set(0, controls.userHeight, 0);
 		scene.add( camera );
 	}
 
 	function addLights() {
-		// var ambient = new THREE.AmbientLight( 0x101030 );
 		var ambient = new __WEBPACK_IMPORTED_MODULE_0_three__["b" /* AmbientLight */]( 0xFFFFFF, 1 );
 		scene.add( ambient );
 
@@ -48853,11 +48836,12 @@ function initializeGltfElement() {
 		buttonContainer.style.width = '200px';
 		buttonContainer.appendChild( enterVR.domElement );
 
+		jQuery( buttonContainer ).find( 'button' ).first().click( function( e ) { e.preventDefault() });
+
 		container.appendChild( buttonContainer );
 	}
 
 	function addFallbackControls() {
-		console.log("doing regular");
 		controls = new __WEBPACK_IMPORTED_MODULE_2__controls_OrbitControls__["a" /* default */]( camera, renderer.domElement );
 		controls.userPan = false;
 		controls.userPanSpeed = 0.0;
@@ -48867,15 +48851,10 @@ function initializeGltfElement() {
 	}
 
 	function addControls() {
-		console.log("adding controls");
-		// controls.autoRotateSpeed = -10.0;
-
 		vreffect = new __WEBPACK_IMPORTED_MODULE_3__effects_VREffect__["a" /* default */]( renderer );
 
 		// add WebVR controls
 		if ( navigator.getVRDisplays !== undefined ) {
-			console.log("doing VR");
-			vreffect.scale = 2.0;
 			controls = new __WEBPACK_IMPORTED_MODULE_1__controls_VRControls__["a" /* default */]( camera );
 			controls.standing = true;
 			addWebVRButton( vreffect );
@@ -48899,31 +48878,9 @@ function initializeGltfElement() {
 	}
 
 	function onResize() {
-		console.log("resizing");
-
-		if ( vreffect.isPresenting ) {
-			// resize canvas container
-			// container.style.position = 'absolute';
-			// container.style.top = '0';
-			// container.style.left = '0';
-			// container.style.width = window.innerWidth + 'px';
-			// container.style.height = window.innerHeight + 'px';
-			// var size = renderer.getSize();
-			// console.log(size);
-			// var width = size.width;
-			// var height = size.height;
-			// camera.aspect = width / height;
-			// camera.updateProjectionMatrix();
-			// camera.aspect = ( width / 2 ) / height;
-		} else {
-			// container.style.position = 'inherit';
-			// container.style.width = null;
-			// container.style.height = null;
-			// container.style.top = null;
-			// container.style.left = null;
+		if ( ! vreffect.isPresenting ) {
 			var width = container.offsetWidth;
 			var height = container.offsetHeight;
-			console.log("setting resolution to " + width + " by " + height );
 			camera.aspect = width / height;
 			camera.updateProjectionMatrix();
 			vreffect.setSize( width, height );
@@ -48965,15 +48922,9 @@ function initializeGltfElement() {
 	}
 
 	container = $el.get(0);
-	// fullscreenContainer = 
 
 	// necessary for the enter VR button to appear in the right position
-	$el.css({'position':'relative'});
-
-	// set the height of the container so that it has the same aspect ratio
-	// as the screen
-	// var elHeight = ( window.screen.height / window.screen.width ) * $el.offsetWidth;
-	// $el.css({'height': elHeight + 'px'});
+	$el.css({'position':'relative'});;
 
 	scene = new __WEBPACK_IMPORTED_MODULE_0_three__["g" /* Scene */]();
 
@@ -48984,11 +48935,6 @@ function initializeGltfElement() {
 	addLoadingLogger();
 	addListeners();
 
-	// make sure the canvas scales to full screen
-	// renderer.domElement.style.width = '100%';
-	// renderer.domElement.style.height = '100%';
-	// renderer.domElement.style.top = '0';
-
 	container.appendChild( renderer.domElement );
 
 	loadModel( $el.data( 'model' ), $el.data( 'scale' ) );
@@ -48998,7 +48944,6 @@ function initializeGltfElement() {
 
 jQuery( function() {
 	jQuery( '.gltf-model' ).each( initializeGltfElement );
-	// jQuery( 'body' ).each( initializeGltfElement );
 } );
 
 /***/ })

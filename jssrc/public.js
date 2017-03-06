@@ -12,16 +12,11 @@ function initializeGltfElement() {
 
 	function addCamera() {
 		camera = new THREE.PerspectiveCamera( 40, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
-		// camera.rotation.y = Math.PI;
-		// camera.position.set(0, 2, 3);
-		// camera.quaternion.set(0,0,0,1);
 		camera.position.set(0, 5, 3);
-		// camera.position.set(0, controls.userHeight, 0);
 		scene.add( camera );
 	}
 
 	function addLights() {
-		// var ambient = new THREE.AmbientLight( 0x101030 );
 		var ambient = new THREE.AmbientLight( 0xFFFFFF, 1 );
 		scene.add( ambient );
 
@@ -53,11 +48,12 @@ function initializeGltfElement() {
 		buttonContainer.style.width = '200px';
 		buttonContainer.appendChild( enterVR.domElement );
 
+		jQuery( buttonContainer ).find( 'button' ).first().click( function( e ) { e.preventDefault() });
+
 		container.appendChild( buttonContainer );
 	}
 
 	function addFallbackControls() {
-		console.log("doing regular");
 		controls = new OrbitControls( camera, renderer.domElement );
 		controls.userPan = false;
 		controls.userPanSpeed = 0.0;
@@ -67,15 +63,10 @@ function initializeGltfElement() {
 	}
 
 	function addControls() {
-		console.log("adding controls");
-		// controls.autoRotateSpeed = -10.0;
-
 		vreffect = new VREffect( renderer );
 
 		// add WebVR controls
 		if ( navigator.getVRDisplays !== undefined ) {
-			console.log("doing VR");
-			vreffect.scale = 2.0;
 			controls = new VRControls( camera );
 			controls.standing = true;
 			addWebVRButton( vreffect );
@@ -99,31 +90,9 @@ function initializeGltfElement() {
 	}
 
 	function onResize() {
-		console.log("resizing");
-
-		if ( vreffect.isPresenting ) {
-			// resize canvas container
-			// container.style.position = 'absolute';
-			// container.style.top = '0';
-			// container.style.left = '0';
-			// container.style.width = window.innerWidth + 'px';
-			// container.style.height = window.innerHeight + 'px';
-			// var size = renderer.getSize();
-			// console.log(size);
-			// var width = size.width;
-			// var height = size.height;
-			// camera.aspect = width / height;
-			// camera.updateProjectionMatrix();
-			// camera.aspect = ( width / 2 ) / height;
-		} else {
-			// container.style.position = 'inherit';
-			// container.style.width = null;
-			// container.style.height = null;
-			// container.style.top = null;
-			// container.style.left = null;
+		if ( ! vreffect.isPresenting ) {
 			var width = container.offsetWidth;
 			var height = container.offsetHeight;
-			console.log("setting resolution to " + width + " by " + height );
 			camera.aspect = width / height;
 			camera.updateProjectionMatrix();
 			vreffect.setSize( width, height );
@@ -165,15 +134,9 @@ function initializeGltfElement() {
 	}
 
 	container = $el.get(0);
-	// fullscreenContainer = 
 
 	// necessary for the enter VR button to appear in the right position
-	$el.css({'position':'relative'});
-
-	// set the height of the container so that it has the same aspect ratio
-	// as the screen
-	// var elHeight = ( window.screen.height / window.screen.width ) * $el.offsetWidth;
-	// $el.css({'height': elHeight + 'px'});
+	$el.css({'position':'relative'});;
 
 	scene = new THREE.Scene();
 
@@ -184,11 +147,6 @@ function initializeGltfElement() {
 	addLoadingLogger();
 	addListeners();
 
-	// make sure the canvas scales to full screen
-	// renderer.domElement.style.width = '100%';
-	// renderer.domElement.style.height = '100%';
-	// renderer.domElement.style.top = '0';
-
 	container.appendChild( renderer.domElement );
 
 	loadModel( $el.data( 'model' ), $el.data( 'scale' ) );
@@ -198,5 +156,4 @@ function initializeGltfElement() {
 
 jQuery( function() {
 	jQuery( '.gltf-model' ).each( initializeGltfElement );
-	// jQuery( 'body' ).each( initializeGltfElement );
 } );

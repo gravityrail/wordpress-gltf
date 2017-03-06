@@ -82,17 +82,14 @@ class Gltf_Admin {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts( $hook ) {
-		wp_enqueue_script( 'threejs', plugin_dir_url( dirname( __FILE__ ) ) . 'js/three.min.js', null, $this->version, false );
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/gltf-admin.js', array( 'jquery' ), $this->version, false );
 
 		global $post;
 
 		// if we're editing a gltf_scene, load the metabox js
 		if ( ( $hook == 'post-new.php' || $hook == 'post.php' ) && 'gltf_scene' === $post->post_type ) {
-			wp_enqueue_script( 'gltf-admin-select-model-metabox', plugin_dir_url( __FILE__ ) . 'js/gltf-admin-select-model-metabox.js', array( 'jquery' ), $this->version, false );
-
-			require_once dirname( dirname( __FILE__ ) ) . '/includes/class-gltf-model-utils.php';
-			Gltf_Model_Utils::enqueue_scripts( $this->version );
+			wp_enqueue_script( 'gltf-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
+			wp_enqueue_script( 'gltf-admin-select-model-metabox', plugin_dir_url( __FILE__ ) . 'js/gltf-admin-select-model-metabox.js', array( 'jquery', 'gltf-model' ), $this->version, false );
 		}
 	}
 

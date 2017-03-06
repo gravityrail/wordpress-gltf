@@ -95,10 +95,7 @@ class Gltf_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		require_once dirname( dirname( __FILE__ ) ) . '/includes/class-gltf-model-utils.php';
-		// Gltf_Model_Utils::enqueue_common_gltf_scripts( $this->version );
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
-
+		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
 	}
 
 }
