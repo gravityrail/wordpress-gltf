@@ -207,13 +207,13 @@ class Gltf {
 	function select_scene_model_callback( $post ) {
 		wp_nonce_field( basename( __FILE__ ), 'gltf_nonce' );
 
-		// global $post;
 		// Get WordPress' media upload URL
 		$upload_link = esc_url( get_upload_iframe_src( 'image', $post->ID ) );
 
 		// See if there's a media id already saved as post meta
 		$main_model_id = get_post_meta( $post->ID, '_gltf_main_model', true );
 		$main_model_scale = get_post_meta( $post->ID, '_gltf_main_model_scale', true );
+		$main_model_scale = $main_model_scale ? $main_model_scale : 1.0;
 
 		// Get the image src
 		$main_model_url = wp_get_attachment_url( $main_model_id );
@@ -222,14 +222,14 @@ class Gltf {
 		$main_model_is_set = !! $main_model_url;
 		?>
 
-		<!-- Your image container, which can be manipulated with js -->
+		<!-- Model container -->
 		<div class="gltf-main-model-container">
 			<?php if ( $main_model_is_set ) : ?>
 				<div class="gltf-model" data-model="<?php echo $main_model_url; ?>" data-scale="<?php echo $main_model_scale; ?>" style="width: 300px; height: 300px;"></div>
 			<?php endif; ?>
 		</div>
 
-		<!-- Your add & remove image links -->
+		<!-- Add & remove mode links -->
 		<p class="hide-if-no-js">
 			<a class="upload-main-model <?php if ( $main_model_is_set  ) { echo 'hidden'; } ?>" 
 			   href="<?php echo $upload_link ?>">
@@ -241,34 +241,16 @@ class Gltf {
 			</a>
 		</p>
 
-		<!-- A hidden input to set and post the chosen image id -->
+		<!-- A hidden input to set and post the chosen model id -->
 		<input class="main-model-id" name="main-model-id" type="hidden" value="<?php echo esc_attr( $main_model_id ); ?>" />
 
 		<p>
 			<label for="main-model-scale">
 				<?php _e( 'Model Scale', 'gltf-media-type '); ?>
-				<input class="main-model-scale" name="main-model-scale" value="<?php echo esc_attr( $main_model_scale ? $main_model_scale : 1.0 ); ?>" />
+				<input class="main-model-scale" name="main-model-scale" value="<?php echo esc_attr( $main_model_scale ); ?>" />
 			</label>
 		</p>
 		<?php
-		/* 
-		
-		$gltf_stored_meta = get_post_meta( $post->ID );
-		?>
-		<p>
-			<span class="gltf-row-title"><?php _e( 'Example Radio Buttons', 'gltf-media-type' )?></span>
-			<div class="gltf-row-content">
-				<label for="meta-radio-one">
-					<input type="radio" name="meta-radio" id="meta-radio-one" value="radio-one" <?php if ( isset ( $gltf_stored_meta['meta-radio'] ) ) checked( $gltf_stored_meta['meta-radio'][0], 'radio-one' ); ?>>
-					<?php _e( 'Radio Option #1', 'gltf-media-type' )?>
-				</label>
-				<label for="meta-radio-two">
-					<input type="radio" name="meta-radio" id="meta-radio-two" value="radio-two" <?php if ( isset ( $gltf_stored_meta['meta-radio'] ) ) checked( $gltf_stored_meta['meta-radio'][0], 'radio-two' ); ?>>
-					<?php _e( 'Radio Option #2', 'gltf-media-type' )?>
-				</label>
-			</div>
-		</p><?php
-		*/
 	}
 
 	public function save_scene_metaboxes( $post_id, $post, $update ) {
@@ -280,11 +262,7 @@ class Gltf {
 		if ( $is_autosave || $is_revision || !$is_valid_nonce ) {
 			return;
 		}
-	 
-		// Checks for input and sanitizes/saves if needed
-		// if( isset( $_POST[ 'meta-text' ] ) ) {
-		// 	update_post_meta( $post_id, 'meta-text', sanitize_text_field( $_POST[ 'meta-text' ] ) );
-		// }
+
 		if( isset( $_POST[ 'main-model-id' ] ) ) {
 			update_post_meta( $post_id, '_gltf_main_model', $_POST[ 'main-model-id' ] );
 		}
