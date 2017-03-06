@@ -21,7 +21,7 @@ GITPATH="$CURRENTDIR/" # this file should be in the base of your git repository
 # svn config
 SVNPATH="/tmp/$PLUGINSLUG" # path to a temp SVN repo. No trailing slash required and don't add trunk.
 SVNURL="http://plugins.svn.wordpress.org/$PLUGINSLUG/" # Remote SVN repo on WordPress.org, with no trailing slash
-SVNUSER="benbalter" # your svn username
+SVNUSER="goldsounds" # your svn username
  
 # Let's begin...
 echo ".........................................."
@@ -32,9 +32,9 @@ echo ".........................................."
 echo
  
 # Check version in readme.txt is the same as plugin file
-NEWVERSION1=`grep "^Stable tag" $GITPATH/readme.txt | awk -F' ' '{print $3}'`
+NEWVERSION1=`grep "^Stable tag" $GITPATH/README.txt | awk -F' ' '{print $3}'`
 echo "readme version: $NEWVERSION1"
-NEWVERSION2=`grep "^Version" $GITPATH/$MAINFILE | awk -F' ' '{print $2}'`
+NEWVERSION2=`grep "* Version" $GITPATH/$MAINFILE | awk -F' ' '{print $3}'`
 echo "$MAINFILE version: $NEWVERSION2"
  
 if [ "$NEWVERSION1" != "$NEWVERSION2" ]; then echo "Versions don't match. Exiting...."; exit 1; fi
