@@ -225,7 +225,7 @@ class Gltf {
 		<!-- Your image container, which can be manipulated with js -->
 		<div class="gltf-main-model-container">
 			<?php if ( $main_model_is_set ) : ?>
-				<div class="gltf-model" data-model="<?php echo $main_model_url ?>" data-scale="1.0" style="width: 300px; height: 300px;"></div>
+				<div class="gltf-model" data-model="<?php echo $main_model_url; ?>" data-scale="<?php echo $main_model_scale; ?>" style="width: 300px; height: 300px;"></div>
 			<?php endif; ?>
 		</div>
 
