@@ -48924,7 +48924,7 @@ function initializeGltfElement() {
 	container = $el.get(0);
 
 	// necessary for the enter VR button to appear in the right position
-	$el.css({'position':'relative'});;
+	$el.css( { 'position': 'relative' } );
 
 	scene = new __WEBPACK_IMPORTED_MODULE_0_three__["g" /* Scene */]();
 
