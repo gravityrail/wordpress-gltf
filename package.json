@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/gravityrail/wordpress-gltf#readme",
   "devDependencies": {
-    "three": "^0.84.0",
+    "imports-loader": "^0.7.1",
+    "ray-input": "git+https://github.com/borismus/ray-input.git",
+    "three": "git+https://github.com/mrdoob/three.js.git#dev",
     "uglify-js": "^2.8.4",
     "uglifyjs-webpack-plugin": "^0.2.1",
     "webvr-ui": "^0.9.4"

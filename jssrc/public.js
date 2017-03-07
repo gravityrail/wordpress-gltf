@@ -1,14 +1,16 @@
-import * as THREE from 'three';
-import VRControls from './controls/VRControls';
-import OrbitControls from './controls/OrbitControls';
-import VREffect from './effects/VREffect';
-import GLTFLoader from './loaders/GLTFLoader';
+require( 'three/examples/js/controls/VRControls' );
+require( 'three/examples/js/controls/OrbitControls' );
+require( 'three/examples/js/effects/VREffect' );
+// require( 'three/examples/js/loaders/GLTFLoader' );
+require( 'three/examples/js/loaders/GLTF2Loader' );
+
+import RayInput from 'ray-input'
 import * as webvrui from 'webvr-ui';
 
 function initializeGltfElement() {
 	var $el = jQuery(this);
 
-	var container, camera, scene, renderer, controls, mixer, vreffect, fullscreenContainer;
+	var container, camera, scene, renderer, controls, mixer, vreffect, input;
 
 	function addCamera() {
 		camera = new THREE.PerspectiveCamera( 40, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
@@ -54,7 +56,7 @@ function initializeGltfElement() {
 	}
 
 	function addFallbackControls() {
-		controls = new OrbitControls( camera, renderer.domElement );
+		controls = new THREE.OrbitControls( camera, renderer.domElement );
 		controls.userPan = false;
 		controls.userPanSpeed = 0.0;
 		controls.maxDistance = 5000.0;
@@ -63,16 +65,39 @@ function initializeGltfElement() {
 	}
 
 	function addControls() {
-		vreffect = new VREffect( renderer );
+		vreffect = new THREE.VREffect( renderer );
 
 		// add WebVR controls
 		if ( navigator.getVRDisplays !== undefined ) {
-			controls = new VRControls( camera );
+			controls = new THREE.VRControls( camera );
 			controls.standing = true;
 			addWebVRButton( vreffect );
 		} else {
 			addFallbackControls();
 		}
+	}
+
+	function addController() {
+		input = new RayInput( camera, renderer.domElement );
+
+		input.on('raydown', (opt_mesh) => {
+			// Called when an object was activated. If there is a selected object,
+			// opt_mesh is that object.
+			console.log('raydown');
+			// console.log(opt_mesh);
+		});
+
+		// Register a callback when an object is selected.
+		input.on('rayover', (mesh) => {
+			// Called when an object was selected.
+			console.log('rayover');
+			// console.log(mesh);
+		});
+
+		// render a visual representation of the ray input
+		scene.add( input.getMesh() );
+
+		input.setSize( renderer.getSize() );
 	}
 
 	function addRenderer() {
@@ -97,6 +122,8 @@ function initializeGltfElement() {
 			camera.updateProjectionMatrix();
 			vreffect.setSize( width, height );
 		}
+
+		input.setSize( renderer.getSize() );
 	}
 
 	function addListeners() {
@@ -105,8 +132,7 @@ function initializeGltfElement() {
 	}
 
 	function loadModel( modelUrl, modelScale ) {
-		GLTFLoader.Shaders.removeAll(); // remove all previous shaders
-		var loader = new GLTFLoader();
+		var loader = new THREE.GLTF2Loader();
 		loader.load( modelUrl, function( data ) {
 			var object = data.scene;
 			object.scale.set(modelScale, modelScale, modelScale);
@@ -121,6 +147,9 @@ function initializeGltfElement() {
 			}
 
 			scene.add( object );
+
+			// register with the controller input
+			input.add( object );
 		} );
 	}
 
@@ -131,7 +160,35 @@ function initializeGltfElement() {
 		}
 		vreffect.render( scene, camera );
 		controls.update();
+		input.update();
 	}
+
+	function addGround() {
+		var groundMaterial = new THREE.MeshPhongMaterial({
+				color: 0xFFFFFF,
+				shading: THREE.SmoothShading
+			});
+		var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(512, 512), groundMaterial);
+		// ground.receiveShadow = true;
+		ground.position.z = -2;
+		ground.rotation.x = -Math.PI / 2;
+		scene.add(ground);
+	}
+
+	// function addSpotlight() {
+	// 	var spot1   = new THREE.SpotLight( 0xffffff, 1 );
+	// 	spot1.position.set( 10, 20, 10 );
+	// 	spot1.angle = 0.25;
+	// 	spot1.distance = 1024;
+	// 	spot1.penumbra = 0.75;
+
+	// 	//shadows
+	// 	spot1.castShadow = true;
+	// 	spot1.shadow.bias = 0.0001;
+	// 	spot1.shadow.mapSize.width = 2048;
+	// 	spot1.shadow.mapSize.height = 2048;
+	// 	scene.add( spot1 );
+	// }
 
 	container = $el.get(0);
 
@@ -144,8 +201,11 @@ function initializeGltfElement() {
 	addCamera(); // CAMERA!
 	addRenderer(); // ACTION! :)
 	addControls();
+	addController();
 	addLoadingLogger();
 	addListeners();
+	addGround();
+	addSpotlight();
 
 	container.appendChild( renderer.domElement );
 

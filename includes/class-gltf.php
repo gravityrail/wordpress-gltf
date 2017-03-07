@@ -60,10 +60,16 @@ class Gltf {
 	// @see https://github.com/KhronosGroup/glTF/tree/master/specification/1.0#mimetypes
 	// @see https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_binary_glTF#mime-type
 	protected $gltf_mime_types = array( 
-		'glb' => 'model/gltf.binary',
-		'gltf' => 'model/gltf+json',
-		'bin' => 'application/octet-stream',
-		'glsl' => 'text/plain'
+		'glb'   => 'model/gltf.binary',
+		'gltf'  => 'model/gltf+json',
+		'bin'   => 'application/octet-stream',
+		'glsl'  => 'text/plain',
+		'vert'  => 'text/x-glsl',
+		'vsh'   => 'text/x-glsl',
+		'gsh'   => 'text/x-glsl',
+		'frag'  => 'text/x-glsl',
+		'glsl'  => 'text/x-glsl',
+		'shader'=> 'text/x-glsl',
 	);
 
 	/**
@@ -176,7 +182,7 @@ class Gltf {
 			'scale' => '1.0'
 		), $atts );
 
-		return '<div class="gltf-model" style="height: 200px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
+		return '<div class="gltf-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
 	}
 
 	public function register_scene_post_type() {
