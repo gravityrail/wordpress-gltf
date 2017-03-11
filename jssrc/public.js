@@ -1,8 +1,8 @@
 require( 'three/examples/js/controls/VRControls' );
 require( 'three/examples/js/controls/OrbitControls' );
 require( 'three/examples/js/effects/VREffect' );
-// require( 'three/examples/js/loaders/GLTFLoader' );
-require( 'three/examples/js/loaders/GLTF2Loader' );
+require( 'three/examples/js/loaders/GLTFLoader' );
+// require( 'three/examples/js/loaders/GLTF2Loader' );
 
 import RayInput from 'ray-input'
 import * as webvrui from 'webvr-ui';
@@ -132,7 +132,7 @@ function initializeGltfElement() {
 	}
 
 	function loadModel( modelUrl, modelScale ) {
-		var loader = new THREE.GLTF2Loader();
+		var loader = new THREE.GLTFLoader();
 		loader.load( modelUrl, function( data ) {
 			var object = data.scene;
 			object.scale.set(modelScale, modelScale, modelScale);
@@ -154,13 +154,13 @@ function initializeGltfElement() {
 	}
 
 	function animate() {
-		vreffect.requestAnimationFrame( animate );
+		controls.update();
+		input.update();
 		if ( typeof mixer != "undefined" ) {
 			mixer.update();
 		}
 		vreffect.render( scene, camera );
-		controls.update();
-		input.update();
+		vreffect.requestAnimationFrame( animate );
 	}
 
 	function addGround() {
@@ -175,20 +175,20 @@ function initializeGltfElement() {
 		scene.add(ground);
 	}
 
-	// function addSpotlight() {
-	// 	var spot1   = new THREE.SpotLight( 0xffffff, 1 );
-	// 	spot1.position.set( 10, 20, 10 );
-	// 	spot1.angle = 0.25;
-	// 	spot1.distance = 1024;
-	// 	spot1.penumbra = 0.75;
+	function addSpotlight() {
+		var spot1   = new THREE.SpotLight( 0xffffff, 1 );
+		spot1.position.set( 10, 20, 10 );
+		spot1.angle = 0.25;
+		spot1.distance = 1024;
+		spot1.penumbra = 0.75;
 
-	// 	//shadows
-	// 	spot1.castShadow = true;
-	// 	spot1.shadow.bias = 0.0001;
-	// 	spot1.shadow.mapSize.width = 2048;
-	// 	spot1.shadow.mapSize.height = 2048;
-	// 	scene.add( spot1 );
-	// }
+		//shadows
+		spot1.castShadow = true;
+		spot1.shadow.bias = 0.0001;
+		spot1.shadow.mapSize.width = 2048;
+		spot1.shadow.mapSize.height = 2048;
+		scene.add( spot1 );
+	}
 
 	container = $el.get(0);
 
@@ -204,8 +204,8 @@ function initializeGltfElement() {
 	addController();
 	addLoadingLogger();
 	addListeners();
-	addGround();
-	addSpotlight();
+	// addGround();
+	// addSpotlight();
 
 	container.appendChild( renderer.domElement );
 

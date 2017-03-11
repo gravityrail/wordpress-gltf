@@ -47077,20 +47077,19 @@ var THREE = __webpack_require__(0);
  * @author mrdoob / http://mrdoob.com/
  * @author Tony Parisi / http://www.tonyparisi.com/
  * @author Takahiro / https://github.com/takahirox
- * @author Don McCurdy / https://www.donmccurdy.com
  */
 
-THREE.GLTF2Loader = ( function () {
+THREE.GLTFLoader = ( function () {
 
-	function GLTF2Loader( manager ) {
+	function GLTFLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	}
 
-	GLTF2Loader.prototype = {
+	GLTFLoader.prototype = {
 
-		constructor: GLTF2Loader,
+		constructor: GLTFLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -47148,7 +47147,7 @@ THREE.GLTF2Loader = ( function () {
 
 			}
 
-			console.time( 'GLTF2Loader' );
+			console.time( 'GLTFLoader' );
 
 			var parser = new GLTFParser( json, extensions, {
 
@@ -47159,7 +47158,7 @@ THREE.GLTF2Loader = ( function () {
 
 			parser.parse( function ( scene, scenes, cameras, animations ) {
 
-				console.timeEnd( 'GLTF2Loader' );
+				console.timeEnd( 'GLTFLoader' );
 
 				var glTF = {
 					"scene": scene,
@@ -47227,6 +47226,18 @@ THREE.GLTF2Loader = ( function () {
 		};
 
 	}
+
+	/* GLTFSHADERS */
+
+	GLTFLoader.Shaders = {
+
+		update: function () {
+
+			console.warn( 'THREE.GLTFLoader.Shaders has been deprecated, and now updates automatically.' );
+
+		}
+
+	};
 
 	/* GLTFSHADER */
 
@@ -47326,6 +47337,19 @@ THREE.GLTF2Loader = ( function () {
 					break;
 
 			}
+
+		}
+
+	};
+
+
+	/* ANIMATION */
+
+	GLTFLoader.Animations = {
+
+		update: function () {
+
+			console.warn( 'THREE.GLTFLoader.Animation has been deprecated. Use THREE.AnimationMixer instead.' );
 
 		}
 
@@ -48033,7 +48057,7 @@ THREE.GLTF2Loader = ( function () {
 
 			} else {
 
-				console.warn( 'THREE.GLTF2Loader: ' + buffer.type + ' buffer type is not supported' );
+				console.warn( 'THREE.GLTFLoader: ' + buffer.type + ' buffer type is not supported' );
 
 			}
 
@@ -48124,7 +48148,7 @@ THREE.GLTF2Loader = ( function () {
 
 			return _each( json.textures, function ( texture ) {
 
-				if ( texture.source !== undefined ) {
+				if ( texture.source ) {
 
 					return new Promise( function ( resolve ) {
 
@@ -48157,14 +48181,14 @@ THREE.GLTF2Loader = ( function () {
 
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
-								console.warn( 'THREE.GLTF2Loader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
-								              'internalFormat will be forced to be the same value as format.' );
+								console.warn( 'THREE.GLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
+															'internalFormat will be forced to be the same value as format.' );
 
 							}
 
 							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
 
-							if ( texture.sampler !== undefined ) {
+							if ( texture.sampler ) {
 
 								var sampler = json.samplers[ texture.sampler ];
 
@@ -48655,7 +48679,7 @@ THREE.GLTF2Loader = ( function () {
 
 							var attributeEntry = attributes[ attributeId ];
 
-							if ( attributeEntry === undefined ) return;
+							if ( ! attributeEntry ) return;
 
 							var bufferAttribute = dependencies.accessors[ attributeEntry ];
 
@@ -48693,7 +48717,7 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						if ( primitive.indices !== undefined ) {
+						if ( primitive.indices ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -48743,7 +48767,7 @@ THREE.GLTF2Loader = ( function () {
 
 						var meshNode;
 
-						if ( primitive.indices !== undefined ) {
+						if ( primitive.indices ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -48984,30 +49008,16 @@ THREE.GLTF2Loader = ( function () {
 
 					var node = json.nodes[ nodeId ];
 
-					var meshes;
+					if ( node.meshes !== undefined ) {
 
-					if ( node.mesh !== undefined) {
+						for ( var meshId in node.meshes ) {
 
-						meshes = [ node.mesh ];
-
-					} else if ( node.meshes !== undefined ) {
-
-						console.warn( 'GLTF2Loader: Legacy glTF file detected. Nodes may have no more than 1 mesh.' );
-
-						meshes = node.meshes;
-
-					}
-
-					if ( meshes !== undefined ) {
-
-						for ( var meshId in meshes ) {
-
-							var mesh = meshes[ meshId ];
+							var mesh = node.meshes[ meshId ];
 							var group = dependencies.meshes[ mesh ];
 
 							if ( group === undefined ) {
 
-								console.warn( 'GLTF2Loader: Couldn\'t find node "' + mesh + '".' );
+								console.warn( 'GLTFLoader: Couldn\'t find node "' + mesh + '".' );
 								continue;
 
 							}
@@ -49060,7 +49070,7 @@ THREE.GLTF2Loader = ( function () {
 
 								var skinEntry;
 
-								if ( node.skin !== undefined ) {
+								if ( node.skin ) {
 
 									skinEntry = dependencies.skins[ node.skin ];
 
@@ -49236,7 +49246,7 @@ THREE.GLTF2Loader = ( function () {
 
 				_scene.traverse( function ( child ) {
 
-					// Register raw material meshes with GLTF2Loader.Shaders
+					// Register raw material meshes with GLTFLoader.Shaders
 					if ( child.material && child.material.isRawShaderMaterial ) {
 
 						child.gltfShader = new GLTFShader( child, dependencies.nodes );
@@ -49256,7 +49266,7 @@ THREE.GLTF2Loader = ( function () {
 
 	};
 
-	return GLTF2Loader;
+	return GLTFLoader;
 
 } )();
 
@@ -50418,8 +50428,8 @@ var THREE = __webpack_require__(0);
 __webpack_require__( 11 );
 __webpack_require__( 10 );
 __webpack_require__( 12 );
-// require( 'three/examples/js/loaders/GLTFLoader' );
 __webpack_require__( 13 );
+// require( 'three/examples/js/loaders/GLTF2Loader' );
 
 
 
@@ -50427,7 +50437,7 @@ __webpack_require__( 13 );
 function initializeGltfElement() {
 	var $el = jQuery(this);
 
-	var container, camera, scene, renderer, controls, mixer, vreffect, input, spot1, ground;
+	var container, camera, scene, renderer, controls, mixer, vreffect, input;
 
 	function addCamera() {
 		camera = new THREE.PerspectiveCamera( 40, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
@@ -50512,7 +50522,7 @@ function initializeGltfElement() {
 		});
 
 		// render a visual representation of the ray input
-		scene.add(input.getMesh());
+		scene.add( input.getMesh() );
 
 		input.setSize( renderer.getSize() );
 	}
@@ -50549,7 +50559,7 @@ function initializeGltfElement() {
 	}
 
 	function loadModel( modelUrl, modelScale ) {
-		var loader = new THREE.GLTF2Loader();
+		var loader = new THREE.GLTFLoader();
 		loader.load( modelUrl, function( data ) {
 			var object = data.scene;
 			object.scale.set(modelScale, modelScale, modelScale);
@@ -50571,52 +50581,29 @@ function initializeGltfElement() {
 	}
 
 	function animate() {
-		vreffect.requestAnimationFrame( animate );
+		controls.update();
+		input.update();
 		if ( typeof mixer != "undefined" ) {
 			mixer.update();
 		}
 		vreffect.render( scene, camera );
-		controls.update();
-		input.update();
-	}
-
-	function renderGamepad() {
-		// raycaster.ray.origin.copy( gamepad.position );
-		// raycaster.ray.direction.set( 0, 0, - 1 ).applyQuaternion( gamepad.quaternion );
-		// var intersects = raycaster.intersectObjects( scene.children );
-		// if ( intersects.length > 0 ) {
-		// 	if ( INTERSECTED != intersects[ 0 ].object ) {
-		// 		if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-		// 		INTERSECTED = intersects[ 0 ].object;
-		// 		INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-		// 		INTERSECTED.material.emissive.setHex( 0xff0000 );
-		// 	}
-		// } else {
-		// 	if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-		// 	INTERSECTED = undefined;
-		// }
+		vreffect.requestAnimationFrame( animate );
 	}
 
 	function addGround() {
 		var groundMaterial = new THREE.MeshPhongMaterial({
-				color: 0xFF0000,
+				color: 0xFFFFFF,
 				shading: THREE.SmoothShading
 			});
-		ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(512, 512), groundMaterial);
-		// if (sceneInfo.shadows) {
-			ground.receiveShadow = true;
-		// }
-		// if (sceneInfo.groundPos) {
-			// ground.position.copy(sceneInfo.groundPos);
-		// } else {
-			ground.position.z = -2;
-		// }
+		var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(512, 512), groundMaterial);
+		// ground.receiveShadow = true;
+		ground.position.z = -2;
 		ground.rotation.x = -Math.PI / 2;
 		scene.add(ground);
 	}
 
 	function addSpotlight() {
-		spot1   = new THREE.SpotLight( 0xffffff, 1 );
+		var spot1   = new THREE.SpotLight( 0xffffff, 1 );
 		spot1.position.set( 10, 20, 10 );
 		spot1.angle = 0.25;
 		spot1.distance = 1024;
@@ -50644,8 +50631,8 @@ function initializeGltfElement() {
 	addController();
 	addLoadingLogger();
 	addListeners();
-	addGround();
-	addSpotlight();
+	// addGround();
+	// addSpotlight();
 
 	container.appendChild( renderer.domElement );
 
