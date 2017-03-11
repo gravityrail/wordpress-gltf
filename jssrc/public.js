@@ -14,7 +14,6 @@ function initializeGltfElement() {
 
 	function addCamera() {
 		camera = new THREE.PerspectiveCamera( 40, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
-		camera.position.set(0, 5, 3);
 		scene.add( camera );
 	}
 
@@ -50,18 +49,11 @@ function initializeGltfElement() {
 		buttonContainer.style.width = '200px';
 		buttonContainer.appendChild( enterVR.domElement );
 
+		// this hack is necessary so that clicking Enter VR doesn't submit any
+		// forms that this control may happen to be in, e.g. in wp-admin
 		jQuery( buttonContainer ).find( 'button' ).first().click( function( e ) { e.preventDefault() });
 
 		container.appendChild( buttonContainer );
-	}
-
-	function addFallbackControls() {
-		controls = new THREE.OrbitControls( camera, renderer.domElement );
-		controls.userPan = false;
-		controls.userPanSpeed = 0.0;
-		controls.maxDistance = 5000.0;
-		controls.maxPolarAngle = Math.PI * 0.495;
-		controls.autoRotate = false;
 	}
 
 	function addControls() {
@@ -69,12 +61,10 @@ function initializeGltfElement() {
 
 		// add WebVR controls
 		if ( navigator.getVRDisplays !== undefined ) {
-			controls = new THREE.VRControls( camera );
-			controls.standing = true;
 			addWebVRButton( vreffect );
-		} else {
-			addFallbackControls();
 		}
+
+		setControls();
 	}
 
 	function addController() {
@@ -126,9 +116,31 @@ function initializeGltfElement() {
 		input.setSize( renderer.getSize() );
 	}
 
+	function setControls() {
+		if ( controls ) {
+			controls.dispose();
+		}
+
+		if ( vreffect.isPresenting ) {
+			controls = new THREE.VRControls( camera );
+			controls.standing = true;
+		} else {
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.userPan = false;
+			controls.userPanSpeed = 0.0;
+			controls.maxDistance = 5000.0;
+			controls.maxPolarAngle = Math.PI * 0.495;
+			controls.autoRotate = false;
+		}
+
+		camera.position.set(0, 5, 3);
+		controls.update();
+	}
+
 	function addListeners() {
 		window.addEventListener('resize', onResize, true);
 		window.addEventListener('vrdisplaypresentchange', onResize, true);
+		window.addEventListener('vrdisplaypresentchange', setControls, true);
 	}
 
 	function loadModel( modelUrl, modelScale ) {
