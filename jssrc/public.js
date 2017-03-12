@@ -104,7 +104,7 @@ function initializeGltfElement() {
 		};
 	}
 
-	function onResize() {
+	function setRendererSize() {
 		if ( ! vreffect.isPresenting ) {
 			var width = container.offsetWidth;
 			var height = container.offsetHeight;
@@ -133,13 +133,13 @@ function initializeGltfElement() {
 			controls.autoRotate = false;
 		}
 
-		camera.position.set(0, 5, 3);
+		camera.position.set(0, 1, 3);
 		controls.update();
 	}
 
 	function addListeners() {
-		window.addEventListener('resize', onResize, true);
-		window.addEventListener('vrdisplaypresentchange', onResize, true);
+		window.addEventListener('resize', setRendererSize, true);
+		window.addEventListener('vrdisplaypresentchange', setRendererSize, true);
 		window.addEventListener('vrdisplaypresentchange', setControls, true);
 	}
 
