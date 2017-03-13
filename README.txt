@@ -11,6 +11,8 @@ A plugin to upload and render glTF 3D models in WordPress.
 
 == Description ==
 
+WARNING: This code is pretty experimental and there are lots of breaking changes all the time. This is because WebVR and GLTF are fast-moving standards, as is the browser support for these standards, so please bear with me while the dust settles on this brave new world :)
+
 [glTF](https://github.com/KhronosGroup/glTF) is an emerging open standard for the transmission and storage of 3D models. This plugin allows you to upload these models in "Embedded JSON" and Binary formats. Currently, inline rendering is only supported for the JSON format.
 
 The ultimate goal of this plugin is to provide a 3D "post type" (gltf_scene) which allows the user to compose an interactive scene populated by objects that represent other content from their site (e.g. a book containing posts in a particular category, a door leading to another page or site). It is also a goal to make this content work best in VR headsets, but with a workable fallback for browsers.
