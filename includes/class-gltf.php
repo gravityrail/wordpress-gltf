@@ -179,10 +179,11 @@ class Gltf {
 	public function model_shortcode( $atts ) {
 		$a = shortcode_atts( array(
 			'url' => '',
-			'scale' => '1.0'
+			'scale' => '1.0',
+			'gltf_version' => '2'
 		), $atts );
 
-		return '<div class="gltf-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
+		return '<div class="gltf-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'" data-gltf-version="'.htmlspecialchars($a['gltf_version']).'"></div>';
 	}
 
 	public function register_scene_post_type() {

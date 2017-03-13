@@ -7,7 +7,8 @@ jQuery(function($){
 	  delModelLink = metaBox.find( '.delete-main-model'),
 	  modelContainer = metaBox.find( '.gltf-main-model-container'),
 	  modelIdInput = metaBox.find( '.main-model-id' ),
-		modelScaleInput = metaBox.find( '.main-model-scale' );
+	  modelScaleInput = metaBox.find( '.main-model-scale' ),
+	  modelGltfVersionInput = metaBox.find( '.main-model-gltf-version' );
   
   // ADD IMAGE LINK
   addModelLink.on( 'click', function( event ){
@@ -27,7 +28,7 @@ jQuery(function($){
 				text: 'Use this model'
 			},
 			multiple: false,  // Set to true to allow multiple files to be selected
-			library: { type: [ 'model/gltf+json' ] }
+			library: { type: [ 'model/gltf+json', 'model/gltf.binary' ] }
 		});
 
 		// When an image is selected in the media frame...
@@ -41,8 +42,14 @@ jQuery(function($){
 				scale = '1.0';
 			}
 
+			var gltfVersion = modelGltfVersionInput.val();
+
+			if ( '' == gltfVersion ) {
+				gltfVersion = '1';
+			}
+
 			// Send the attachment URL to our custom image input field.
-			modelContainer.append( '<div class="gltf-model" data-model="'+attachment.url+'" data-scale="'+scale+'" style="width: 300px; height: 300px;"></div>' );
+			modelContainer.append( '<div class="gltf-model" data-model="'+attachment.url+'" data-scale="'+scale+'" data-gltf-version="'+gltfVersion+'" style="width: 300px; height: 300px;"></div>' );
 
 			// Send the attachment id to our hidden input
 			modelIdInput.val( attachment.id );
