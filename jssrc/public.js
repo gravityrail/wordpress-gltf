@@ -2,7 +2,7 @@ require( 'three/examples/js/controls/VRControls' );
 require( 'three/examples/js/controls/OrbitControls' );
 require( 'three/examples/js/effects/VREffect' );
 require( 'three/examples/js/loaders/GLTFLoader' );
-// require( 'three/examples/js/loaders/GLTF2Loader' );
+require( 'three/examples/js/loaders/GLTF2Loader' );
 
 import RayInput from 'ray-input'
 import * as webvrui from 'webvr-ui';
@@ -143,11 +143,22 @@ function initializeGltfElement() {
 		window.addEventListener('vrdisplaypresentchange', setControls, true);
 	}
 
-	function loadModel( modelUrl, modelScale ) {
-		var loader = new THREE.GLTFLoader();
+	function loadModel( modelUrl, modelScale, gltfVersion ) {
+		var loader;
+
+		if ( ! gltfVersion ) {
+			gltfVersion = '2';
+		}
+
+		if ( '1' == gltfVersion ) {
+			loader = new THREE.GLTFLoader();	
+		} else {
+			loader = new THREE.GLTF2Loader();
+		}
+
 		loader.load( modelUrl, function( data ) {
 			var object = data.scene;
-			object.scale.set(modelScale, modelScale, modelScale);
+			object.scale.set( modelScale, modelScale, modelScale );
 
 			var animations = data.animations;
 			if ( animations && animations.length ) {
@@ -221,7 +232,7 @@ function initializeGltfElement() {
 
 	container.appendChild( renderer.domElement );
 
-	loadModel( $el.data( 'model' ), $el.data( 'scale' ) );
+	loadModel( $el.data( 'model' ), $el.data( 'scale' ), $el.data( 'gltf-version' ) );
 
 	animate();
 }
