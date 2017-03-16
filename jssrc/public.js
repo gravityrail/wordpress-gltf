@@ -160,8 +160,6 @@ function initializeGltfElement() {
 		} else {
 			shouldRender = false;
 		}
-		
-		console.log(shouldRender);
 	}
 
 	function addListeners() {
@@ -210,7 +208,6 @@ function initializeGltfElement() {
 		if ( ! shouldRender ) {
 			return;
 		}
-		console.log('rendering');
 		controls.update();
 		input.update();
 		if ( typeof mixer != "undefined" ) {
