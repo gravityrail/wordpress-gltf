@@ -7,10 +7,25 @@ require( 'three/examples/js/loaders/GLTF2Loader' );
 import RayInput from 'ray-input'
 import * as webvrui from 'webvr-ui';
 
+// http://stackoverflow.com/a/7557433/912709 
+function isElementInViewport( el ) {
+    var rect = el.getBoundingClientRect();
+
+    return (
+		(
+			( rect.top >= 0 && ( rect.top <= (window.innerHeight || document.documentElement.clientHeight) ) ) ||
+			( rect.bottom >= 0 && ( rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) ) )
+		) && (
+			( rect.left >= 0 && ( rect.left <= (window.innerWidth || document.documentElement.clientWidth) ) ) ||
+			( rect.right >= 0 && ( rect.right <= (window.innerWidth || document.documentElement.clientWidth) ) )
+		)        
+    );
+}
+
 function initializeGltfElement() {
 	var $el = jQuery(this);
 
-	var container, camera, scene, renderer, controls, mixer, vreffect, input;
+	var container, camera, scene, renderer, controls, mixer, vreffect, input, shouldRender = false;
 
 	function addCamera() {
 		camera = new THREE.PerspectiveCamera( 40, container.offsetWidth / container.offsetHeight, 0.1, 1000 );
@@ -137,10 +152,25 @@ function initializeGltfElement() {
 		controls.update();
 	}
 
+	function checkRendererVisibility() {
+		// only render if full screen or our DOM element is visible
+		if ( vreffect.isPresenting || isElementInViewport( renderer.domElement ) ) {
+			shouldRender = true;
+			animate();
+		} else {
+			shouldRender = false;
+		}
+		
+		console.log(shouldRender);
+	}
+
 	function addListeners() {
 		window.addEventListener('resize', setRendererSize, true);
 		window.addEventListener('vrdisplaypresentchange', setRendererSize, true);
 		window.addEventListener('vrdisplaypresentchange', setControls, true);
+
+		// http://stackoverflow.com/a/7557433/912709 
+		jQuery(window).on('DOMContentLoaded load resize scroll vrdisplaypresentchange', checkRendererVisibility );
 	}
 
 	function loadModel( modelUrl, modelScale, gltfVersion ) {
@@ -177,6 +207,10 @@ function initializeGltfElement() {
 	}
 
 	function animate() {
+		if ( ! shouldRender ) {
+			return;
+		}
+		console.log('rendering');
 		controls.update();
 		input.update();
 		if ( typeof mixer != "undefined" ) {
