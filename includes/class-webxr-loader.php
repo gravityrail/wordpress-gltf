@@ -6,8 +6,8 @@
  * @link       http://goldsounds.com
  * @since      1.0.0
  *
- * @package    Gltf
- * @subpackage Gltf/includes
+ * @package    WebXR
+ * @subpackage WebXR/includes
  */
 
 /**
@@ -17,11 +17,11 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Gltf
- * @subpackage Gltf/includes
+ * @package    WebXR
+ * @subpackage WebXR/includes
  * @author     Daniel Walmsley <goldsounds@gmail.com>
  */
-class Gltf_Loader {
+class WebXR_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.

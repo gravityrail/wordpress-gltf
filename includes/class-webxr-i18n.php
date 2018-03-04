@@ -9,8 +9,8 @@
  * @link       http://goldsounds.com
  * @since      1.0.0
  *
- * @package    Gltf
- * @subpackage Gltf/includes
+ * @package    WebXR
+ * @subpackage WebXR/includes
  */
 
 /**
@@ -20,11 +20,11 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Gltf
- * @subpackage Gltf/includes
+ * @package    WebXR
+ * @subpackage WebXR/includes
  * @author     Daniel Walmsley <goldsounds@gmail.com>
  */
-class Gltf_i18n {
+class WebXR_i18n {
 
 
 	/**
@@ -35,7 +35,7 @@ class Gltf_i18n {
 	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			'gltf',
+			'webxr',
 			false,
 			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);

@@ -9,8 +9,8 @@
  * @link       http://goldsounds.com
  * @since      1.0.0
  *
- * @package    Gltf
- * @subpackage Gltf/includes
+ * @package    WebXR
+ * @subpackage WebXR/includes
  */
 
 /**
@@ -23,11 +23,11 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Gltf
- * @subpackage Gltf/includes
+ * @package    WebXR
+ * @subpackage WebXR/includes
  * @author     Daniel Walmsley <goldsounds@gmail.com>
  */
-class Gltf {
+class WebXR {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -35,7 +35,7 @@ class Gltf {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Gltf_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      WebXR_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -57,21 +57,6 @@ class Gltf {
 	 */
 	protected $version;
 
-	// @see https://github.com/KhronosGroup/glTF/tree/master/specification/1.0#mimetypes
-	// @see https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_binary_glTF#mime-type
-	protected $gltf_mime_types = array( 
-		'glb'   => 'model/gltf.binary',
-		'gltf'  => 'model/gltf+json',
-		'bin'   => 'application/octet-stream',
-		'glsl'  => 'text/plain',
-		'vert'  => 'text/x-glsl',
-		'vsh'   => 'text/x-glsl',
-		'gsh'   => 'text/x-glsl',
-		'frag'  => 'text/x-glsl',
-		'glsl'  => 'text/x-glsl',
-		'shader'=> 'text/x-glsl',
-	);
-
 	/**
 	 * Define the core functionality of the plugin.
 	 *
@@ -83,7 +68,7 @@ class Gltf {
 	 */
 	public function __construct() {
 
-		$this->plugin_name = 'gltf';
+		$this->plugin_name = 'webxr';
 		$this->version = '1.0.0';
 
 		$this->load_dependencies();
@@ -99,10 +84,10 @@ class Gltf {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Gltf_Loader. Orchestrates the hooks of the plugin.
-	 * - Gltf_i18n. Defines internationalization functionality.
-	 * - Gltf_Admin. Defines all hooks for the admin area.
-	 * - Gltf_Public. Defines all hooks for the public side of the site.
+	 * - WebXR_Loader. Orchestrates the hooks of the plugin.
+	 * - WebXR_i18n. Defines internationalization functionality.
+	 * - WebXR_Admin. Defines all hooks for the admin area.
+	 * - WebXR_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -113,57 +98,62 @@ class Gltf {
 	private function load_dependencies() {
 
 		/**
+		 * Utility functions
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webxr-model-utils.php';
+
+		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-gltf-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webxr-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-gltf-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webxr-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-gltf-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-webxr-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-gltf-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-webxr-public.php';
 
-		$this->loader = new Gltf_Loader();
+		$this->loader = new WebXR_Loader();
 
 	}
 
 	private function register_media() {
 		add_filter( 'upload_mimes', array( $this, 'upload_mime_types' ) );
 		add_filter( 'wp_mime_type_icon', array( $this, 'mime_types_icons' ), 10, 3 );
-		add_shortcode( 'gltf_model', array( $this, 'model_shortcode' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_model_render_script' ) );
+		add_shortcode( 'webxr_model', array( $this, 'model_shortcode' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'init', array( $this, 'register_scene_post_type' ) );
-		add_action( 'add_meta_boxes_gltf_scene', array( $this, 'add_scene_metaboxes' ) );
-		add_action( 'save_post_gltf_scene', array( $this, 'save_scene_metaboxes' ), 10, 3 );
+		add_action( 'add_meta_boxes_webxr_scene', array( $this, 'add_scene_metaboxes' ) );
+		add_action( 'save_post_webxr_scene', array( $this, 'save_scene_metaboxes' ), 10, 3 );
 		add_filter( 'single_template', array( $this, 'register_scene_template' ) );
+		add_filter( 'the_content', array( $this, 'render_model_attachment' ) );
 
 		// remove the sidebars before rendering a scene
 		add_filter( 'body_class', function( $classes ) {
 			global $post;
-			
-			if ( $post && $post->post_type == 'gltf_scene' && in_array( 'has-sidebar', $classes ) ) {
+
+			if ( $post && $post->post_type == 'webxr_scene' && in_array( 'has-sidebar', $classes ) ) {
 				$classes = array_diff( $classes, array('has-sidebar') );
 			}
-			
+
 			return $classes;
 		}, 99, 1 );
 	}
 
 	public function upload_mime_types( $mimes ) {
-		foreach( $this->gltf_mime_types as $ext => $type ) {
-			error_log("permitting $ext");
+		foreach( WebXR_Model_Utils::$gltf_mime_types as $ext => $type ) {
 			$mimes[ $ext ] = $type;
 		}
 
@@ -171,7 +161,7 @@ class Gltf {
 	}
 
 	public function mime_types_icons( $icon, $mime, $post_id ) {
-		if ( in_array( $mime, array_values( $this->gltf_mime_types ) ) ) {
+		if ( WebXR_Model_Utils::is_gltf_model_type( $mime ) ) {
 			return plugin_dir_url( dirname( __FILE__ ) ) . 'admin/images/model-icon.png';
 		}
 	}
@@ -179,15 +169,14 @@ class Gltf {
 	public function model_shortcode( $atts ) {
 		$a = shortcode_atts( array(
 			'url' => '',
-			'scale' => '1.0',
-			'gltf_version' => '2'
+			'scale' => '1.0'
 		), $atts );
 
-		return '<div class="gltf-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'" data-gltf-version="'.htmlspecialchars($a['gltf_version']).'"></div>';
+		return '<div class="webxr-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
 	}
 
 	public function register_scene_post_type() {
-		register_post_type( 'gltf_scene',
+		register_post_type( 'webxr_scene',
 			array(
 				'labels' => array(
 					'name'          => __( 'Scenes' ),
@@ -206,73 +195,76 @@ class Gltf {
 	}
 
 	function add_scene_metaboxes() {
-		add_meta_box( 'gltf_select_scene_model', __( 'Select Scene Model', 'gltf-media-type' ), array( $this, 'select_scene_model_callback' ), 'gltf_scene' );
+		add_meta_box( 'webxr_select_scene_model', __( '3D Models', 'webxr' ), array( $this, 'select_scene_model_callback' ), 'webxr_scene' );
 	}
 
 	function select_scene_model_callback( $post ) {
-		wp_nonce_field( basename( __FILE__ ), 'gltf_nonce' );
+		wp_nonce_field( basename( __FILE__ ), 'webxr_nonce' );
 
 		// Get WordPress' media upload URL
 		$upload_link = esc_url( get_upload_iframe_src( 'image', $post->ID ) );
 
-		// See if there's a media id already saved as post meta
-		$main_model_id = get_post_meta( $post->ID, '_gltf_main_model', true );
-		$main_model_scale = get_post_meta( $post->ID, '_gltf_main_model_scale', true );
-		$main_model_scale = $main_model_scale ? $main_model_scale : 1.0;
-
-		// Get the image src
-		$main_model_url = wp_get_attachment_url( $main_model_id );
-
-		// For convenience, see if the array is valid
-		$main_model_is_set = !! $main_model_url;
 		?>
-
-		<!-- Model container -->
-		<div class="gltf-main-model-container">
-			<?php if ( $main_model_is_set ) : ?>
-				<div class="gltf-model" data-model="<?php echo $main_model_url; ?>" data-scale="<?php echo $main_model_scale; ?>" style="width: 300px; height: 300px;"></div>
-			<?php endif; ?>
-		</div>
-
-		<!-- Add & remove mode links -->
-		<p class="hide-if-no-js">
-			<a class="upload-main-model <?php if ( $main_model_is_set  ) { echo 'hidden'; } ?>" 
-			   href="<?php echo $upload_link ?>">
-				<?php _e('Set main 3D model') ?>
+		<div class="scene-models">
+			<a class="upload-model" href="<?php echo $upload_link ?>">
+				<?php _e('Add 3D model') ?>
 			</a>
-			<a class="delete-main-model <?php if ( ! $main_model_is_set  ) { echo 'hidden'; } ?>" 
-			  href="#">
-				<?php _e('Remove this 3D model') ?>
-			</a>
-		</p>
-
-		<!-- A hidden input to set and post the chosen model id -->
-		<input class="main-model-id" name="main-model-id" type="hidden" value="<?php echo esc_attr( $main_model_id ); ?>" />
-
-		<p>
-			<label for="main-model-scale">
-				<?php _e( 'Model Scale', 'gltf-media-type '); ?>
-				<input class="main-model-scale" name="main-model-scale" value="<?php echo esc_attr( $main_model_scale ); ?>" />
-			</label>
-		</p>
 		<?php
+
+		$models = get_post_meta( $post->ID, '_webxr_model' );
+
+		foreach( $models as $model ) {
+
+			// See if there's a media id already saved as post meta
+			$model_uuid = $model['id'];
+			$model_attachment_id = $model['attachment_id'];
+			$model_scale = $model['scale'];
+			$model_scale = $model_scale ? $model_scale : 1.0;
+			// TODO position
+
+			// Get the image src
+			$model_url = wp_get_attachment_url( $model_id );
+
+			// For convenience, see if the array is valid
+			?>
+
+			<!-- Model container -->
+			<div class="webxr-model-container" id="webxr-model-<?php echo $model_uuid; ?>">
+				<div class="webxr-model" data-model="<?php echo $model_url; ?>" data-scale="<?php echo $model_scale; ?>" style="width: 300px; height: 300px;"></div>
+				<!-- A hidden input to set and post the chosen model id -->
+				<input class="model-id" name="model-id" type="hidden" value="<?php echo esc_attr( $model_attachment_id ); ?>" />
+				<a class="delete-model <?php if ( ! $model_is_set  ) { echo 'hidden'; } ?>"
+				href="#">
+					<?php _e('Remove this 3D model') ?>
+				</a>
+				<p>
+					<label for="model-scale">
+						<?php _e( 'Model Scale', 'webxr'); ?>
+						<input class="model-scale" name="model-scale" value="<?php echo esc_attr( $model_scale ); ?>" />
+					</label>
+				</p>
+			</div>
+			<?php
+		}
+
+		echo "</div>";
 	}
 
 	public function save_scene_metaboxes( $post_id, $post, $update ) {
 		$is_autosave = wp_is_post_autosave( $post_id );
 		$is_revision = wp_is_post_revision( $post_id );
-		$is_valid_nonce = ( isset( $_POST[ 'gltf_nonce' ] ) && wp_verify_nonce( $_POST[ 'gltf_nonce' ], basename( __FILE__ ) ) ) ? 'true' : 'false';
-	 
+		$is_valid_nonce = ( isset( $_POST[ 'webxr_nonce' ] ) && wp_verify_nonce( $_POST[ 'webxr_nonce' ], basename( __FILE__ ) ) ) ? 'true' : 'false';
+
 		// Exits script depending on save status
 		if ( $is_autosave || $is_revision || !$is_valid_nonce ) {
 			return;
 		}
 
-		if( isset( $_POST[ 'main-model-id' ] ) ) {
-			update_post_meta( $post_id, '_gltf_main_model', $_POST[ 'main-model-id' ] );
+		if( isset( $_POST[ 'model-id' ] ) ) {
+			update_post_meta( $post_id, '_webxr_model', $_POST[ 'model-id' ] );
 		}
-		if( isset( $_POST[ 'main-model-scale' ] ) ) {
-			update_post_meta( $post_id, '_gltf_main_model_scale', $_POST[ 'main-model-scale' ] );
+		if( isset( $_POST[ 'model-scale' ] ) ) {
+			update_post_meta( $post_id, '_webxr_model_scale', $_POST[ 'model-scale' ] );
 		}
 	}
 
@@ -280,24 +272,50 @@ class Gltf {
 		global $wp_query, $post;
 
 		/* Checks for single template by post type */
-		if ($post->post_type == 'gltf_scene'){
-			return dirname( dirname( __FILE__ ) ) . '/public/templates/single-gltf_scene.php';
+		if ($post->post_type == 'webxr_scene'){
+			return dirname( dirname( __FILE__ ) ) . '/public/templates/single-webxr_scene.php';
 		}
 
 		return $single;
 	}
 
-	public function enqueue_model_render_script() {
+	/**
+	 * Intercept model attachment pages so that header/footer are rendered from the theme
+	 */
+	public function render_model_attachment( $content ) {
+		$post = get_post();
+		if ( $post && $post->post_type == 'attachment' && WebXR_Model_Utils::is_gltf_model_type( $post->post_mime_type ) ) {
+			// render style tag
+			$style_tag = <<<ENDSTYLE
+			<style>
+				.gltf-model-scene {
+					width: 100%;
+					height: auto;
+					min-height: 300px;
+				}
+			</style>
+ENDSTYLE;
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-aframe-scene-builder.php';
+			$scene = new AFrame_Scene_Builder( 'webxr-gltf-model-'.$post->ID, 'gltf-model-scene' );
+			$scene
+				->add_gltf_model( 'model', wp_get_attachment_url( $post->ID ) );
+
+			return $style_tag . $scene->build();
+		}
+		return $content;
+	}
+
+	public function enqueue_scripts() {
 		global $post;
-		if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'gltf_model') ) {
-			wp_enqueue_script( 'gltf-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
+		if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'webxr_model') ) {
+			wp_enqueue_script( 'webxr-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
 		}
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Gltf_i18n class in order to set the domain and to register the hook
+	 * Uses the WebXR_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -305,7 +323,7 @@ class Gltf {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new Gltf_i18n();
+		$plugin_i18n = new WebXR_i18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 
@@ -320,7 +338,7 @@ class Gltf {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Gltf_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new WebXR_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -336,7 +354,7 @@ class Gltf {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Gltf_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new WebXR_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
@@ -367,7 +385,7 @@ class Gltf {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Gltf_Loader    Orchestrates the hooks of the plugin.
+	 * @return    WebXR_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

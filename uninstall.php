@@ -22,7 +22,7 @@
  * @link       http://goldsounds.com
  * @since      1.0.0
  *
- * @package    Gltf
+ * @package    WebXR
  */
 
 // If uninstall not called from WordPress, then exit.

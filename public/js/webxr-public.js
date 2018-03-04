@@ -1,15 +1,15 @@
 'use strict';
 
-window.GltfScene = wp.api.models.Post.extend({
+window.WebXRScene = wp.api.models.Post.extend({
 	urlRoot: wpApiSettings.root + '/scene',
 	defaults: {
 		type: 'scene'
 	}
 });
 
-window.GltfScenes = wp.api.collections.Posts.extend({
+window.WebXRScenes = wp.api.collections.Posts.extend({
 	url: wpApiSettings.root + '/scenes',
-	model: GltfScene
+	model: WebXRScene
 });
 
 // self.events = new MyEvents;
@@ -24,7 +24,7 @@ window.GltfScenes = wp.api.collections.Posts.extend({
 // 	});
 // });
 
-window.GltfSceneRenderer = function() {
+window.WebXRSceneRenderer = function() {
 
 	var container, camera, scene, renderer, controls;
 
@@ -169,7 +169,7 @@ window.GltfSceneRenderer = function() {
 			console.log("here we go");
 			initScene( id );
 			wp.api.loadPromise.done( function() {
-				var scene = new window.GltfScene( { id: scene_id } );
+				var scene = new window.WebXRScene( { id: scene_id } );
 				console.log(scene);
 				scene.fetch();
 				console.log(scene);

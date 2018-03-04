@@ -8,8 +8,8 @@
  * @link       http://goldsounds.com
  * @since      1.0.0
  *
- * @package    Gltf
- * @subpackage Gltf/admin/partials
+ * @package    WebXR
+ * @subpackage WebXR/admin/partials
  */
 ?>
 

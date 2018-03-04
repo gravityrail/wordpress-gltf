@@ -5,18 +5,18 @@
  *
  * @link              http://goldsounds.com
  * @since             1.0.0
- * @package           Gltf
+ * @package           webxr
  *
  * @wordpress-plugin
- * Plugin Name:       GLTF Media Type
- * Plugin URI:        http://goldsounds.com/plugins/gltf
- * Description:       A plugin to upload and render glTF 3D models in WordPress.
- * Version:           1.4
+ * Plugin Name:       WebXR
+ * Plugin URI:        http://goldsounds.com/plugins/webxr
+ * Description:       A plugin to render WordPress content in XR (VR or AR) scenes.
+ * Version:           1.0
  * Author:            Daniel Walmsley
  * Author URI:        http://goldsounds.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       gltf
+ * Text Domain:       webxr
  * Domain Path:       /languages
  */
 
@@ -27,30 +27,30 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-gltf-activator.php
+ * This action is documented in includes/class-webxr-activator.php
  */
-function activate_gltf() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-gltf-activator.php';
-	Gltf_Activator::activate();
+function activate_webxr() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-webxr-activator.php';
+	WebXR_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-gltf-deactivator.php
+ * This action is documented in includes/class-webxr-deactivator.php
  */
-function deactivate_gltf() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-gltf-deactivator.php';
-	Gltf_Deactivator::deactivate();
+function deactivate_webxr() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-webxr-deactivator.php';
+	WebXR_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_gltf' );
-register_deactivation_hook( __FILE__, 'deactivate_gltf' );
+register_activation_hook( __FILE__, 'activate_webxr' );
+register_deactivation_hook( __FILE__, 'deactivate_webxr' );
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-gltf.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-webxr.php';
 
 /**
  * Begins execution of the plugin.
@@ -61,10 +61,10 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-gltf.php';
  *
  * @since    1.0.0
  */
-function run_gltf() {
+function run_webxr() {
 
-	$plugin = new Gltf();
+	$plugin = new WebXR();
 	$plugin->run();
 
 }
-run_gltf();
+run_webxr();

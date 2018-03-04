@@ -6,8 +6,8 @@
  * @link       http://goldsounds.com
  * @since      1.0.0
  *
- * @package    Gltf
- * @subpackage Gltf/admin
+ * @package    WebXR
+ * @subpackage WebXR/admin
  */
 
 /**
@@ -16,11 +16,11 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Gltf
- * @subpackage Gltf/admin
+ * @package    WebXR
+ * @subpackage WebXR/admin
  * @author     Daniel Walmsley <goldsounds@gmail.com>
  */
-class Gltf_Admin {
+class WebXR_Admin {
 
 	/**
 	 * The ID of this plugin.
@@ -64,15 +64,15 @@ class Gltf_Admin {
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Gltf_Loader as all of the hooks are defined
+		 * defined in WebXR_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Gltf_Loader will then create the relationship
+		 * The WebXR_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/gltf-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/webxr-admin.css', array(), $this->version, 'all' );
 
 	}
 
@@ -82,14 +82,14 @@ class Gltf_Admin {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts( $hook ) {
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/gltf-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/webxr-admin.js', array( 'jquery' ), $this->version, false );
 
 		global $post;
 
-		// if we're editing a gltf_scene, load the metabox js
-		if ( ( $hook == 'post-new.php' || $hook == 'post.php' ) && 'gltf_scene' === $post->post_type ) {
-			wp_enqueue_script( 'gltf-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
-			wp_enqueue_script( 'gltf-admin-select-model-metabox', plugin_dir_url( __FILE__ ) . 'js/gltf-admin-select-model-metabox.js', array( 'jquery', 'gltf-model' ), $this->version, false );
+		// if we're editing a webxr_scene, load the metabox js
+		if ( ( $hook == 'post-new.php' || $hook == 'post.php' ) && 'webxr_scene' === $post->post_type ) {
+			wp_enqueue_script( 'webxr-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
+			wp_enqueue_script( 'webxr-admin-select-model-metabox', plugin_dir_url( __FILE__ ) . 'js/webxr-admin-select-model-metabox.js', array( 'jquery', 'webxr-model' ), $this->version, false );
 		}
 	}
 

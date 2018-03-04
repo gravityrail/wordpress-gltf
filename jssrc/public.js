@@ -2,12 +2,12 @@ require( 'three/examples/js/controls/VRControls' );
 require( 'three/examples/js/controls/OrbitControls' );
 require( 'three/examples/js/effects/VREffect' );
 require( 'three/examples/js/loaders/GLTFLoader' );
-require( 'three/examples/js/loaders/GLTF2Loader' );
+// require( 'three/examples/js/loaders/GLTF2Loader' );
 
 import RayInput from 'ray-input'
 import * as webvrui from 'webvr-ui';
 
-// http://stackoverflow.com/a/7557433/912709 
+// http://stackoverflow.com/a/7557433/912709
 function isElementInViewport( el ) {
     var rect = el.getBoundingClientRect();
 
@@ -18,11 +18,11 @@ function isElementInViewport( el ) {
 		) && (
 			( rect.left >= 0 && ( rect.left <= (window.innerWidth || document.documentElement.clientWidth) ) ) ||
 			( rect.right >= 0 && ( rect.right <= (window.innerWidth || document.documentElement.clientWidth) ) )
-		)        
+		)
     );
 }
 
-function initializeGltfElement() {
+function initializeWebXRElement() {
 	var $el = jQuery(this);
 
 	var container, camera, scene, renderer, controls, mixer, vreffect, input, shouldRender = false;
@@ -36,9 +36,9 @@ function initializeGltfElement() {
 		var ambient = new THREE.AmbientLight( 0xFFFFFF, 1 );
 		scene.add( ambient );
 
-		var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-		directionalLight.position.set( 0, 0, 1 );
-		scene.add( directionalLight );
+		// var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+		// directionalLight.position.set( 0, 0, 1 );
+		// scene.add( directionalLight );
 	}
 
 	function addWebVRButton( effect ) {
@@ -156,7 +156,7 @@ function initializeGltfElement() {
 		// only render if full screen or our DOM element is visible
 		if ( vreffect.isPresenting || isElementInViewport( renderer.domElement ) ) {
 			shouldRender = true;
-			animate();
+			vreffect.requestAnimationFrame( animate );
 		} else {
 			shouldRender = false;
 		}
@@ -167,22 +167,12 @@ function initializeGltfElement() {
 		window.addEventListener('vrdisplaypresentchange', setRendererSize, true);
 		window.addEventListener('vrdisplaypresentchange', setControls, true);
 
-		// http://stackoverflow.com/a/7557433/912709 
+		// http://stackoverflow.com/a/7557433/912709
 		jQuery(window).on('DOMContentLoaded load resize scroll vrdisplaypresentchange', checkRendererVisibility );
 	}
 
-	function loadModel( modelUrl, modelScale, gltfVersion ) {
-		var loader;
-
-		if ( ! gltfVersion ) {
-			gltfVersion = '2';
-		}
-
-		if ( '1' == gltfVersion ) {
-			loader = new THREE.GLTFLoader();	
-		} else {
-			loader = new THREE.GLTF2Loader();
-		}
+	function loadModel( modelUrl, modelScale ) {
+		const loader = new THREE.GLTFLoader();
 
 		loader.load( modelUrl, function( data ) {
 			var object = data.scene;
@@ -263,14 +253,14 @@ function initializeGltfElement() {
 
 	container.appendChild( renderer.domElement );
 
-	loadModel( $el.data( 'model' ), $el.data( 'scale' ), $el.data( 'gltf-version' ) );
+	loadModel( $el.data( 'model' ), $el.data( 'scale' ) );
 
 	animate();
 }
 
 // make function globally available
-window.initializeGltfElement = initializeGltfElement;
+window.initializeWebXRElement = initializeWebXRElement;
 
 jQuery( function() {
-	jQuery( '.gltf-model' ).each( initializeGltfElement );
+	jQuery( '.webxr-model' ).each( initializeWebXRElement );
 } );

@@ -6,8 +6,8 @@
  * @link       http://goldsounds.com
  * @since      1.0.0
  *
- * @package    Gltf
- * @subpackage Gltf/includes
+ * @package    WebXR
+ * @subpackage WebXR/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Gltf
- * @subpackage Gltf/includes
+ * @package    WebXR
+ * @subpackage WebXR/includes
  * @author     Daniel Walmsley <goldsounds@gmail.com>
  */
-class Gltf_Deactivator {
+class WebXR_Deactivator {
 
 	/**
 	 * Short Description. (use period)

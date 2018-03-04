@@ -6,8 +6,8 @@
  * @link       http://goldsounds.com
  * @since      1.0.0
  *
- * @package    Gltf
- * @subpackage Gltf/public
+ * @package    WebXR
+ * @subpackage WebXR/public
  */
 
 /**
@@ -16,11 +16,11 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Gltf
- * @subpackage Gltf/public
+ * @package    WebXR
+ * @subpackage WebXR/public
  * @author     Daniel Walmsley <goldsounds@gmail.com>
  */
-class Gltf_Public {
+class WebXR_Public {
 
 	/**
 	 * The ID of this plugin.
@@ -65,15 +65,15 @@ class Gltf_Public {
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Gltf_Loader as all of the hooks are defined
+		 * defined in WebXR_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Gltf_Loader will then create the relationship
+		 * The WebXR_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/gltf-public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/webxr-public.css', array(), $this->version, 'all' );
 
 	}
 
@@ -83,18 +83,12 @@ class Gltf_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Gltf_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Gltf_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		global $post;
+		// enqueue aframe rendering script for attachment pages featuring a single GLTF model
+		if ( is_a( $post, 'WP_Post' ) &&  $post->post_type == 'attachment' && WebXR_Model_Utils::is_gltf_model_type( $post->post_mime_type ) ) {
+			wp_enqueue_script( 'webxr-public-aframe', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public-aframe.js', array( 'jquery' ), $this->version, false );
+		}
+		// unused for now, empty public script
 		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
 	}
 

@@ -1,4 +1,4 @@
-<?php // this defines a full page gltf scene 
+<?php // this defines a full page webxr scene
 ?>
 
 

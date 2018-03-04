@@ -1,5 +1,5 @@
 {
-  "name": "gltf",
+  "name": "webxr",
   "version": "1.0.0",
   "description": "=== Plugin Name === Contributors: goldsounds Tags: comments, spam Requires at least: 4.7 Tested up to: 4.7 Stable tag: 1.2 License: GPLv2 or later License URI: http://www.gnu.org/licenses/gpl-2.0.html",
   "main": "webpack.config.js",
@@ -18,11 +18,14 @@
   },
   "homepage": "https://github.com/gravityrail/wordpress-gltf#readme",
   "devDependencies": {
-    "imports-loader": "^0.7.1",
-    "ray-input": "git+https://github.com/borismus/ray-input.git",
-    "three": "git+https://github.com/mrdoob/three.js.git#dev",
-    "uglify-js": "^2.8.4",
-    "uglifyjs-webpack-plugin": "^0.2.1",
-    "webvr-ui": "^0.9.4"
+    "aframe": "^0.7.1",
+    "babel-preset-env": "^1.6.1",
+    "imports-loader": "^0.8.0",
+    "mesh-ui": "git+https://github.com/mkeblx/mesh-ui.git",
+    "uglify-js": "^3.3.12",
+    "uglifyjs-webpack-plugin": "^1.2.2",
+    "webpack": "^4.0.1",
+    "webpack-cli": "^2.0.10",
+    "webvr-ui": "^0.10.0"
   }
 }
