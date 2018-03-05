@@ -300,6 +300,9 @@ ENDSTYLE;
 			$scene
 				->add_gltf_model( 'model', wp_get_attachment_url( $post->ID ) );
 
+			// allow other code to inject stuff into the scene
+			$scene = apply_filters( 'webxr_model_attachment_pre_render', $scene );
+
 			return $style_tag . $scene->build();
 		}
 		return $content;
