@@ -84,12 +84,14 @@ class WebXR_Public {
 	 */
 	public function enqueue_scripts() {
 		global $post;
+		wp_register_script( 'webxr-public-webcomponent', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public-webcomponent.js', array( 'jquery' ), $this->version, false );
+
 		// enqueue aframe rendering script for attachment pages featuring a single GLTF model
+		// TODO: does this belong here??
 		if ( is_a( $post, 'WP_Post' ) &&  $post->post_type == 'attachment' && WebXR_Model_Utils::is_gltf_model_type( $post->post_mime_type ) ) {
-			wp_enqueue_script( 'webxr-public-aframe', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public-aframe.js', array( 'jquery' ), $this->version, false );
+			wp_enqueue_script( 'webxr-public-webcomponent' );
 		}
 		// unused for now, empty public script
 		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
 	}
-
 }

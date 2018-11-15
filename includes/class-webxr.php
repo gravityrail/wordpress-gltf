@@ -98,9 +98,16 @@ class WebXR {
 	private function load_dependencies() {
 
 		/**
+		 * Scene builder for AFrame
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-aframe-scene-builder.php';
+
+		/**
 		 * Utility functions
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-webxr-model-utils.php';
+		// TODO factor this out, it is silly
+		// WebXR_Model_Utils::$version = $this->version;
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
@@ -168,11 +175,10 @@ class WebXR {
 
 	public function model_shortcode( $atts ) {
 		$a = shortcode_atts( array(
-			'url' => '',
-			'scale' => '1.0'
+			'url' => ''
 		), $atts );
 
-		return '<div class="webxr-model" style="height: 300px" data-scale="'.htmlspecialchars($a['scale']).'" data-model="'.htmlspecialchars($a['url']).'"></div>';
+		return '<model-viewer src="' . htmlspecialchars($a['url']) . '" auto-rotate controls unstable-webxr background-color="green"></model-viewer>';
 	}
 
 	public function register_scene_post_type() {
@@ -295,10 +301,8 @@ class WebXR {
 				}
 			</style>
 ENDSTYLE;
-			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-aframe-scene-builder.php';
-			$scene = new AFrame_Scene_Builder( 'webxr-gltf-model-'.$post->ID, 'gltf-model-scene' );
-			$scene
-				->add_gltf_model( 'model', wp_get_attachment_url( $post->ID ) );
+			$scene = new AFrame_Scene_Builder( 'webxr-gltf-model-'.$post->ID, array( 'class' => 'gltf-model-scene' ), true );
+			$scene->add_gltf_model( 'model', wp_get_attachment_url( $post->ID ) );
 
 			// allow other code to inject stuff into the scene
 			$scene = apply_filters( 'webxr_model_attachment_pre_render', $scene );
@@ -311,7 +315,7 @@ ENDSTYLE;
 	public function enqueue_scripts() {
 		global $post;
 		if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'webxr_model') ) {
-			wp_enqueue_script( 'webxr-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
+			wp_enqueue_script( 'webxr-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public-webcomponent.js', array( 'jquery', 'wp-api' ), $this->version, false );
 		}
 	}
 

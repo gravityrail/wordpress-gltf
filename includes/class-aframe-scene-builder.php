@@ -19,12 +19,17 @@ class AFrame_Element {
 		$this->attrs = array_merge( $this->attrs, $attrs );
 	}
 
-	public function add_child( $el ) {
+	public function add_child( $el, $attrs = null ) {
 		if ( is_null( $this->children ) ) {
 			$this->children = array();
 		}
 
-		$this->children[] = $el;
+		// allow something like `add_child( 'a-mountain', array( 'height' => 10 ) );`
+		if ( is_string( $el ) ) {
+			$this->children[] = new AFrame_Element( $el, $attrs );
+		} else {
+			$this->children[] = $el;
+		}
 	}
 
 	/**
@@ -42,11 +47,18 @@ class AFrame_Element {
 					return '';
 				} elseif ( true === $v ) {
 					return $k;
+				} elseif ( is_array( $v ) ) {
+					$v = $this->to_css( $v );
 				}
 				return $k .'="'. htmlspecialchars($v) .'"';
 			},
 			array_keys($attrs), $attrs
 		)) .'>' . $content . '</' . $name . '>';
+	}
+
+	// TODO: escape the value here
+	protected function to_css( $rules ) {
+		return implode( '; ', array_map( function( $value, $key ) { return "$key: $value"; }, $rules, array_keys( $rules ) ) );
 	}
 }
 
@@ -74,6 +86,12 @@ class AFrame_Img extends AFrame_Element {
 
 class AFrame_Asset extends AFrame_Element { }
 
+class AFrame_Asset_Item extends AFrame_Element {
+	public function __construct( $attrs, $children = null ) {
+		parent::__construct( 'a-asset-item', $attrs, $children );
+	}
+}
+
 class AFrame_Assets extends AFrame_Element {
 	public function __construct( $children ) {
 		parent::__construct( 'a-assets', array(), $children );
@@ -87,15 +105,23 @@ class AFrame_Entity extends AFrame_Element {
 }
 
 class AFrame_Scene_Builder extends AFrame_Element {
+	private $id;
 	private $assets;
+	private $is_embedded;
 
-	public function __construct( $id, $classes = '', $is_embedded = true ) {
+	public function __construct( $id, $attrs = array(), $is_embedded = true ) {
 		$this->assets = array();
-		parent::__construct( 'a-scene', array(
-			'id' => $id,
-			'class' => $classes,
-			'embedded' => $is_embedded
-		) );
+		$this->id = $id;
+		$this->is_embedded = $is_embedded;
+
+		parent::__construct( 'a-scene',
+			array_merge(
+				array(
+					'id' => $id,
+					'embedded' => $is_embedded
+				),
+				$attrs
+			) );
 	}
 
 	/**
@@ -103,15 +129,30 @@ class AFrame_Scene_Builder extends AFrame_Element {
 	 */
 	public function build() {
 		$this->add_child( new AFrame_Assets( $this->assets ) );
-		return parent::build();
+		$html = parent::build();
+
+		if ( $this->is_embedded ) {
+			$html = $this->get_embedded_style() . $html;
+		}
+
+		return $html;
 	}
 
 	// a-entity type=gltf-model
 	public function add_gltf_model( $id, $url ) {
-		return $this->add_child( new AFrame_Entity( array(
+		return $this->add_entity( array(
 			'id' => $id,
 			'gltf-model' => $url
-		) ) );
+		) );
+	}
+
+	public function add_entity( $attrs ) {
+		return $this->add_child( new AFrame_Entity( $attrs ) );
+	}
+
+	public function add_asset( $el ) {
+		$this->assets[] = $el;
+		return $this;
 	}
 
 	// a-assets > a-cubemap
@@ -124,8 +165,20 @@ class AFrame_Scene_Builder extends AFrame_Element {
 			return new AFrame_Img( array( 'src' => $img_url ) );
 		}, $images );
 
-		$this->assets[] = new AFrame_Asset( 'a-cubemap', array( 'id' => $id ), $children );
+		$this->add_asset( new AFrame_Asset( 'a-cubemap', array( 'id' => $id ), $children ) );
 
 		return $this;
+	}
+
+	private function get_embedded_style() {
+		return <<<ENDSTYLE
+		<style>
+			#{$this->id} {
+				width: 100%;
+				height: auto;
+				min-height: 300px;
+			}
+		</style>
+ENDSTYLE;
 	}
 }

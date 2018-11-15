@@ -21,6 +21,26 @@ This plugin includes [Three.js](https://github.com/mrdoob/three.js/), a wonderfu
 
 It also has basic WebVR support, where available.
 
+== Development ==
+
+Relies on building the Google "Model Viewer" Web Component
+
+```
+git clone git@github.com:GoogleWebComponents/model-viewer.git
+cd model-viewer
+npm install
+npm run build
+npm link
+```
+
+Then `cd` into this repo and:
+
+```
+npm install
+npm link @google/model-viewer
+npm run build
+```
+
 == Installation ==
 
 1. Unzip this plugin in the `/wp-content/plugins/` directory
@@ -39,13 +59,13 @@ None yet.
 
 == Changelog ==
 
-= 1.4 = 
+= 1.4 =
 * Added RayInput support
 
-= 1.3 = 
+= 1.3 =
 * Added WebVR support
 
-= 1.2 = 
+= 1.2 =
 * Fetch gltf_scene data as post via REST API
 
 = 1.1 =

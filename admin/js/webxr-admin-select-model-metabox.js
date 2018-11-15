@@ -37,7 +37,7 @@ jQuery(function($){
 
 			// Send the attachment URL to our custom image input field.
 			modelContainer.append(
-				'<div class="webxr-model" data-model="'+attachment.url+'" data-scale="1.0" style="width: 300px; height: 300px;"></div>'
+				'<model-viewer src="'+attachment.url+'" auto-rotate controls style="width: 300px; height: 300px;"></model-viewer>'
 			);
 
 			// Send the attachment id to our hidden input

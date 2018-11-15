@@ -12,7 +12,6 @@ import {validateCubemapSrc} from 'aframe/src/utils/src-loader';
  * Cubemap skybox component for A-Frame.
  * <a-scene skycube="url(#sky)"/>
  */
-console.log("register cubemap");
 aframe.registerComponent('cubemap', {
 	// the src of the cubemap, eg. url(#sky);
 	schema: { type: 'asset' },

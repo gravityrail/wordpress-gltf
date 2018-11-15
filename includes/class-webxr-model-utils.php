@@ -1,6 +1,8 @@
 <?php
 
 class WebXR_Model_Utils {
+	static $version;
+
 	// @see https://github.com/KhronosGroup/glTF/tree/master/specification/1.0#mimetypes
 	// @see https://github.com/KhronosGroup/glTF/tree/master/extensions/Khronos/KHR_binary_glTF#mime-type
 	static $gltf_mime_types = array(

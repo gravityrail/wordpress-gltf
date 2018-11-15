@@ -5,7 +5,8 @@ module.exports = {
   mode: 'development',
   entry: {
     // public: './jssrc/public.js',
-    'public-aframe': './jssrc/public-aframe.js',
+    // 'public-aframe': './jssrc/public-aframe.js',
+    'public-webcomponent': './jssrc/public-webcomponent.js',
     // admin: './jssrc/admin.js'
   },
   output: {

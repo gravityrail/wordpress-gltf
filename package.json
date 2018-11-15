@@ -18,14 +18,14 @@
   },
   "homepage": "https://github.com/gravityrail/wordpress-gltf#readme",
   "devDependencies": {
-    "aframe": "^0.7.1",
+    "aframe": "^0.8.2",
     "babel-preset-env": "^1.6.1",
     "imports-loader": "^0.8.0",
     "mesh-ui": "git+https://github.com/mkeblx/mesh-ui.git",
     "uglify-js": "^3.3.12",
-    "uglifyjs-webpack-plugin": "^1.2.2",
+    "uglifyjs-webpack-plugin": "^2.0.1",
     "webpack": "^4.0.1",
-    "webpack-cli": "^2.0.10",
+    "webpack-cli": "^3.1.2",
     "webvr-ui": "^0.10.0"
   }
 }

@@ -88,7 +88,7 @@ class WebXR_Admin {
 
 		// if we're editing a webxr_scene, load the metabox js
 		if ( ( $hook == 'post-new.php' || $hook == 'post.php' ) && 'webxr_scene' === $post->post_type ) {
-			wp_enqueue_script( 'webxr-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public.js', array( 'jquery', 'wp-api' ), $this->version, false );
+			wp_enqueue_script( 'webxr-model', plugin_dir_url( dirname( __FILE__ ) ) . 'js/public-webcomponent.js', array( 'jquery', 'wp-api' ), $this->version, false );
 			wp_enqueue_script( 'webxr-admin-select-model-metabox', plugin_dir_url( __FILE__ ) . 'js/webxr-admin-select-model-metabox.js', array( 'jquery', 'webxr-model' ), $this->version, false );
 		}
 	}
